@@ -1,0 +1,16 @@
+# Ignorar a pasta node_modules
+node_modules/
+
+# Ignorar variáveis de ambiente
+.env
+
+# Ignorar arquivos de log
+*.log
+
+# Ignorar pastas de cache do npm
+.npm/
+.cache/
+
+# Ignorar arquivos do sistema
+.DS_Store
+Thumbs.db
