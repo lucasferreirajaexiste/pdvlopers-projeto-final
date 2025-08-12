@@ -28,7 +28,7 @@ export default defineConfig([
   },
   // Configuração para o Backend - Para as variáveis globais do Node.js
   {
-    files: ['server.js', 'src/controllers/**/*.js', 'src/routes/**/*.js', 'src/services/**/*.js'],
+    files: ['Server.js', 'src/controllers/**/*.js', 'src/routes/**/*.js', 'src/services/**/*.js'],
     languageOptions: {
         globals: globals.node, // Informa que o ambiente é Node.js
         sourceType: 'module'
