@@ -15,3 +15,8 @@
 .containerMessage {
     display: flex;
 }
+
+.cardsWrapper {
+    display: flex;
+    gap: 1rem;
+}

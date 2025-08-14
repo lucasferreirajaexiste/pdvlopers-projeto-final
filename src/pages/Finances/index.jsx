@@ -3,9 +3,10 @@ import styles from "./finances.module.css";
 import { Button } from "../../components/Finance/Button";
 import { TransactionCard } from "../../components/Finance/TransactionCard";
 import { Tabs } from "../../components/Finance/Tabs";
-import { Header } from "../../components/Finance/Header";
+import { TabContent } from "../../components/Finance/TabContent";
 import { TransactionItem } from "../../components/Finance/TransactionItem";
 import { TransactionList } from "../../components/Finance/TransactionList";
+import { Header } from "../../components/Finance/Header";
 
 import { FaPlus } from "react-icons/fa";
 import { FaArrowTrendUp, FaArrowTrendDown } from "react-icons/fa6";
@@ -13,63 +14,32 @@ import { MdOutlineAttachMoney } from "react-icons/md";
 import { CiCalendar } from "react-icons/ci";
 
 export function Finances() {
-    const tabs = [
-        {
-            id: "transacoes",
-            label: "Transações",
-            content: (
-                <>
-                    <Header
-                        title="Últimas Transações"
-                        subtitle="Histórico de entradas e saídas"
-                        size="small"
-                    />
-                    <div className={styles.containerLastTransactions}>
-                        <TransactionItem
-                            title="Venda #001"
-                            category="vendas"
-                            date="12/08/2025"
-                            amount={150}
-                        />
-                        <TransactionItem
-                            title="Compra de estoque"
-                            category="estoque"
-                            date="12/08/2025"
-                            amount={-500}
-                        />
-                        <TransactionItem
-                            title="Venda #002"
-                            category="vendas"
-                            date="12/08/2025"
-                            amount={89.9}
-                        />
-                        <TransactionItem
-                            title="Aluguel"
-                            category="despesas"
-                            date="12/08/2025"
-                            amount={-1200}
-                        />
-                    </div>
-                </>
-            ),
-        },
-        {
-            id: "graficos",
-            label: "Gráficos",
-            content: (
-                <>
-                    <Header
-                        title="Lucro vs Prejuízo"
-                        subtitle="Comparativo mensal dos últimos 6 meses"
-                        size="small"
-                    />
-                    <div className={styles.containerLastTransactions}>
-                        <TransactionList />
-                    </div>
-                </>
-            ),
-        },
+    const buttons = [
+        { id: 'transacoes', label: "Transações" },
+        { id: 'graficos', label: "Gráficos" },
     ];
+
+    const contents = {
+        transacoes: (
+            <TabContent
+                title="Transações"
+                subtitle="Visualize e gerencie suas transações"
+            >
+                <TransactionItem title="Venda #001" category="Vendas" date="12/08/2025" amount={150} />
+                <TransactionItem title="Compra de estoque" category="Estoque" date="12/08/2025" amount={-500} />
+                <TransactionItem title="Venda #002" category="Vendas" date="12/08/2025" amount={89.90} />
+                <TransactionItem title="Aluguel" category="Despesas" date="12/08/2025" amount={-1200} />
+            </TabContent>
+        ),
+        graficos: (
+            <TabContent
+                title="Gráficos"
+                subtitle="Acompanhe o desempenho financeiro"
+            >
+                <TransactionList />
+            </TabContent>
+        )
+    };
 
     return (
         <div className={styles.container}>
@@ -115,7 +85,7 @@ export function Finances() {
             </div>
 
             <div className={styles.tabs}>
-                <Tabs tabs={tabs} />
+                <Tabs buttons={buttons} contents={contents} />
             </div>
         </div>
     );

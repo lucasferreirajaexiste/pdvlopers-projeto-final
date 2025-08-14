@@ -1,19 +1,16 @@
 .header h1 {
     font-size: 32px;
-    /* tamanho padrão */
 }
 
 .header p {
     font-size: 14px;
-    /* tamanho padrão */
 }
 
 .small h1 {
     font-size: 20px;
-    /* tamanho menor */
 }
 
 .small p {
     font-size: 12px;
-    /* tamanho menor */
+
 }
