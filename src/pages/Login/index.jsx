@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./Login.module.css";
