@@ -17,6 +17,8 @@
 }
 
 .cardsWrapper {
-    display: flex;
+    display: grid;
     gap: 1rem;
+    flex-wrap: wrap;
+    grid-template-columns: repeat(auto-fit, minmax(375px, 1fr));
 }

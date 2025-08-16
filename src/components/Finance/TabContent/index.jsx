@@ -1,5 +1,6 @@
-import { Header } from "../Header";
 import styles from "./TabContent.module.css";
+
+import { Header } from "../Header";
 
 export function TabContent({ title, subtitle, children }) {
     return (
