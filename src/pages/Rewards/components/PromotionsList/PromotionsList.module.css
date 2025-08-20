@@ -1,0 +1,154 @@
+﻿:root{
+  --subtitle: #857373;
+}
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.body{
+  margin-bottom: 1.5rem;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 25px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 640px) {
+  .header {
+    flex-direction: row; 
+    align-items: center;
+    margin-top: 25px;
+  }
+}
+
+.title {
+  white-space: noWrap;
+  font-size: 1.3rem;
+  line-height: normal;
+  font-weight: 600;
+}
+
+.newPromotionButton {
+  display: flex;
+  align-items: center;
+  gap: 0.8125rem;
+  padding: 8px 16px;
+  background-color: black;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: noWrap;
+}
+
+.button {
+  background:none;
+  color: white;
+  border: none;
+  font-weight: 500;
+}
+
+.newPromotionButton:hover {
+  background-color: rgb(44, 44, 44);
+}
+
+.icon {
+  color: white;
+  width: 18px;
+  height: 18px;
+}
+
+
+.promotionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.promotionCard {
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  border-radius: 0.9rem;
+  background-color: #FFFFFF;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1.4375rem; /* 23px */
+}
+
+.promotionInfoHeader{
+  display: flex;
+  justify-content: space-between;
+  gap: -2px;
+
+}
+
+.promotionName {
+  font-weight: 700;
+  font-size: 1.0625rem; /* 17px */
+  line-height: normal;
+  margin-bottom: 0;
+}
+
+.promotionDescription {
+  margin-top: 0;
+  font-size: 0.9375rem; /* 15px*/
+  color: var(--subtitle);
+}
+
+.promotionStatus{
+  display: flex;
+  align-items: center;
+  background-color: black;
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.4rem;
+  height: 1.25rem;
+  border-radius: 0.375rem;
+}
+
+.promotionInfoMetaActions{
+  display: flex;
+  justify-content: space-between;
+}
+
+.promotionDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1875rem;
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.25rem;
+  margin-bottom: 0.25rem;
+}
+.segment{
+  font-weight: 600;
+  color: rgb(23, 23, 23);
+}
+
+.validUntil{
+  color: var(--subtitle);
+}
+
+.actionsContainer {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.editButton, .pauseButton {
+  background-color: #FFFFFF;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  color: rgb(23, 23, 23);
+  padding: 0.21rem 0.75rem;
+  border: 1px solid #DDDDDD;
+  border-radius: 0.5625rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.editButton:hover, .pauseButton:hover {
+  background-color: #dddddd82;
+}

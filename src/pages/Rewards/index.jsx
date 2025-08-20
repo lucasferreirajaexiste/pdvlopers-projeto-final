@@ -1,6 +1,4 @@
-import styles from "./rewards.module.css";
-
-export function Rewards(){
-    return <div className={styles.rewards}><h1>Rewards</h1>
-        </div>
-}
+export { RewardsPage as Rewards } from './RewardsPage/RewardsPage';
+export { HistoryPage } from './HistoryPage';
+export { RewardsListPage } from './RewardsListPage';
+export { PromotionsPage } from './PromotionsPage';

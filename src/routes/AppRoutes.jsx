@@ -6,6 +6,11 @@ import { Login } from "../pages/Login";
 import { Messages } from "../pages/Messages";
 import { Rewards } from "../pages/Rewards";
 import { Signup } from "../pages/Signup";
+import { PointsOverview } from '../pages/Rewards/components/PointsOverview/PointsOverview';
+import { RewardsListPage } from "../pages/Rewards";
+import { HistoryPage } from "../pages/Rewards";
+import { PromotionsPage } from "../pages/Rewards";
+import { PromotionForm } from "../pages/Rewards/components";
 
 export default function AppRoutes(){ 
     return(
@@ -16,7 +21,19 @@ export default function AppRoutes(){
         <Route path="/finances" element={<Finances/>}/>
         <Route path="/login" element={<Login/>}/>
         <Route path="/messages" element={<Messages/>}/>
-        <Route path="/rewards" element={<Rewards/>}/>
+
+        {/* Rota para rewards */}
+        <Route path="/rewards" element={<Rewards/>}>
+          <Route index element={<PointsOverview/>}/> 
+          <Route path="catalog" element={<RewardsListPage/>}/> 
+          <Route path="history" element={<HistoryPage/>}/> 
+          
+          <Route path="promotions" element={<PromotionsPage/>}>
+            <Route path="new-promotion" element={<PromotionForm/>}/>
+          </Route>
+          
+        </Route>
+
         <Route path="/signup" element={<Signup/>}/>
         <Route path="*" element={<Navigate to="/"/>}/>
         </Routes>

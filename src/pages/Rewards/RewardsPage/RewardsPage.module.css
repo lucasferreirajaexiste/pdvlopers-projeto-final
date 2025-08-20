@@ -3,8 +3,9 @@
   --foreground: #020817;
   --muted-foreground: #71717a;
   --background-tabs: rgba(212, 212, 212, 0.185);
+  --background-nav: #F5F5F5;
   --card-foreground: #020817;
-  --background: #ffffff;
+  --background: #F9FAFB;
 }
 
 *{
@@ -48,11 +49,10 @@
   display: flex;
   align-items: center;
   gap: 0.7rem;
-  margin-bottom: 0.5rem;
-  background-color: var(--background-tabs);
-  padding: 0.2rem 0.3rem 0.2rem 0.2rem;
+  background-color: var(--background-nav);
+  padding: 0.2rem 0.3rem;
   border-radius: 0.5rem;
-  width: 23.7rem;
+  width: 23.6rem;
 }
 
 .link {
@@ -69,7 +69,7 @@
 .linkActive {
   font-weight: 600;
   padding: 0.2rem 0.4rem 0.2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.269);
+  box-shadow: 0 1px 3px rgba(140, 140, 140, 0.269);
   background: var(--background);
   border-radius: 0.5rem;
 }

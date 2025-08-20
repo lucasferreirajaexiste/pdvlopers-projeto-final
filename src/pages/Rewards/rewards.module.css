@@ -4,3 +4,12 @@
     align-items: center;
     height: 100vh;
 }
+
+.rewards-container {
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.rewards-link.active {
+  font-weight: 600;
+  color: #2563eb;
+}
