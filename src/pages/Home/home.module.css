@@ -1,6 +1,85 @@
-.home{
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+.container {
+	padding: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.title {
+	font-size: 2rem;
+	font-weight: 700;
+}
+
+.subtitle {
+	color: #6b7280;
+	margin-bottom: 1rem;
+}
+
+.grid3 {
+	display: grid;
+	grid-template-columns: repeat(1, 1fr);
+	gap: 1rem;
+}
+
+@media (min-width: 768px) {
+	.grid3 {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+.grid2 {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+	.grid2 {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+.card {
+	border: 1px solid #e5e7eb;
+	border-radius: 0.5rem;
+	padding: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.cardHeader {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-weight: 600;
+}
+
+.cardContent {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.cardAmount {
+	font-size: 1.5rem;
+	font-weight: 700;
+}
+
+.cardInfo {
+	font-size: 0.75rem;
+	color: #6b7280;
+}
+
+.item {
+	display: flex;
+	justify-content: space-between;
+	padding: 0.5rem 0;
+	border-bottom: 1px solid #e5e7eb;
+}
+
+.badge {
+	font-size: 0.75rem;
+	color: #2563eb;
+	font-weight: 600;
 }
