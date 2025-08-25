@@ -1,10 +1,36 @@
+:root {
+	--amber: #ffbe0bff;
+	--orange-pantone: #fb5607ff;
+	--rose: #ff006eff;
+	--van-dyke: #523a34ff;
+	--azure: #3a86ffff;
+
+	--gradient-top: linear-gradient(
+		0deg,
+		#ffbe0bff,
+		#fb5607ff,
+		#ff006eff,
+		#523a34ff,
+		#3a86ffff
+	);
+	--gradient-right: linear-gradient(
+		90deg,
+		#ffbe0bff,
+		#fb5607ff,
+		#ff006eff,
+		#523a34ff,
+		#3a86ffff
+	);
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   font-family: Arial, sans-serif;
   background-color: #f9f9f9;
@@ -23,5 +49,5 @@ ul {
 button {
   cursor: pointer;
   border: none;
-  background: none;
+  background: none;
 }
