@@ -9,6 +9,5 @@ export function SendMessages({ text }) {
         <div className={styles.button}>
             <Button icon={<FaRegPaperPlane />} text={text} />
         </div>
-
     )
 }
