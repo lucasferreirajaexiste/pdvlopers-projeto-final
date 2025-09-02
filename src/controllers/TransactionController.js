@@ -3,7 +3,7 @@
  */
 
 // Resgatando o Supabase
-import supabase from "../services/Supabase";
+import supabase from "../services/Supabase.js";
 
 // Criação de transações
 export const createTransaction = async (req, res) => {
