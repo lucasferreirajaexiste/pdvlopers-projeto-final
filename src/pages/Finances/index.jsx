@@ -64,8 +64,8 @@ export function Finances() {
         ),
         graficos: (
             <TabContent
-                title="Gráficos"
-                subtitle="Acompanhe o desempenho financeiro"
+                title="Lucro vs Prejuízo"
+                subtitle="Comparativo mensal dos últimos 6 meses"
             >
                 <TransactionList />
             </TabContent>
