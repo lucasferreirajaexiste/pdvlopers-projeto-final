@@ -5,26 +5,24 @@ const Joi = require("joi");
 // Esquema de validação para adicionar pontos a um cliente.
 // - clientId: ID do cliente (UUID obrigatório).
 // - points: número de pontos (inteiro, positivo e obrigatório).
-// - description: descrição opcional (pode ser nula ou string vazia).
 // - amount: valor monetário relacionado à transação (positivo ou nulo).
 const addPointsSchema = Joi.object({
   clientId: Joi.string().uuid().required(),
-  points: Joi.number().integer().positive().required(),
-  description: Joi.string().allow(null, ""),
-  amount: Joi.number().positive().allow(null),
+  amount: Joi.number().positive().required(),
+  description: Joi.string().allow(null, "")
 });
+
 
 // Esquema de validação para resgatar pontos.
 // - clientId: ID do cliente (UUID obrigatório).
-// - points: quantidade de pontos a resgatar (inteiro, positivo e obrigatório).
 // - rewardId: ID do brinde ou recompensa (UUID obrigatório).
 // - description: descrição opcional.
 const redeemPointsSchema = Joi.object({
   clientId: Joi.string().uuid().required(),
-  points: Joi.number().integer().positive().required(),
   rewardId: Joi.string().uuid().required(),
-  description: Joi.string().allow(null, ""),
+  description: Joi.string().allow(null, "")
 });
+
 
 // Esquema de validação para cadastrar ou editar um brinde.
 // - name: nome do brinde (obrigatório).

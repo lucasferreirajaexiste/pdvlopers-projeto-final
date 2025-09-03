@@ -19,17 +19,20 @@ async function getClientPoints(req, res) {
 
 /**
  * Adiciona pontos ao saldo de um cliente
- */
+}*/
 async function addPoints(req, res) {
     // Valida entrada usando Joi
     const { error: validationError } = addPointsSchema.validate(req.body);
     if (validationError) return res.status(400).json({ error: validationError.message });
 
-    const { clientId, points, description, amount } = req.body;
+    const { clientId, amount, description } = req.body;
 
     // Verifica se cliente existe
     const { data: client, error: clientError } = await findClientById(clientId);
     if (clientError || !client) return res.status(404).json({ error: "Cliente não encontrado" });
+
+    // Calcula pontos a partir do valor da compra
+    const points = Math.floor((amount / 100) * 10); // regra: 100 reais = 10 pontos
 
     // Calcula novo saldo
     const newBalance = client.points_balance + points;
@@ -43,60 +46,64 @@ async function addPoints(req, res) {
         type: TRANSACTION_TYPES.EARN,
         points,
         amount,
-        description
+        description: description ?? `Compra de R$${amount} gerou ${points} pontos`
     });
 
     // Retorna sucesso com novo saldo
-    res.status(201).json({ message: "Pontos adicionados", clientId, newBalance });
+    res.status(201).json({ message: "Pontos adicionados", clientId, newBalance, earned: points });
 }
+
 
 /**
  * Resgata pontos do cliente em troca de um brinde
     */
 async function redeemPoints(req, res) {
-    // Valida entrada com Joi
-    const { error: validationError } = redeemPointsSchema.validate(req.body);
-    if (validationError) return res.status(400).json({ error: validationError.message });
+  // Valida entrada com Joi
+  const { error: validationError } = redeemPointsSchema.validate(req.body);
+  if (validationError) return res.status(400).json({ error: validationError.message });
 
-    const { clientId, points, rewardId } = req.body;
+  const { clientId, rewardId, description } = req.body;
 
-    // Verifica se cliente existe
-    const { data: client, error: clientError } = await findClientById(clientId);
-    if (clientError || !client) return res.status(404).json({ error: "Cliente não encontrado" });
+  // Verifica se cliente existe
+  const { data: client, error: clientError } = await findClientById(clientId);
+  if (clientError || !client) return res.status(404).json({ error: "Cliente não encontrado" });
 
-    // Checa se há saldo suficiente
-    if (client.points_balance < points) return res.status(400).json({ error: "Saldo insuficiente" });
+  // Busca o brinde pelo ID
+  const { data: reward, error: rewardError } = await supabase
+    .from("rewards")
+    .select("*")
+    .eq("id", rewardId)
+    .single();
 
-    // Busca o brinde no banco
-    const { data: reward, error: rewardError } = await supabase
-        .from("rewards")
-        .select("id, description")
-        .eq("id", rewardId)
-        .single();
+  if (rewardError || !reward) return res.status(404).json({ error: "Brinde não encontrado" });
 
-    if (rewardError || !reward) return res.status(404).json({ error: "Brinde não encontrado" });
+  // Checa se há saldo suficiente
+  if (client.points_balance < reward.points_required) {
+    return res.status(400).json({ error: "Saldo insuficiente" });
+  }
 
-    // Calcula novo saldo
-    const newBalance = client.points_balance - points;
+  // Calcula novo saldo
+  const newBalance = client.points_balance - reward.points_required;
 
-    // Atualiza saldo no banco
-    await updateClientPoints(clientId, newBalance);
+  // Atualiza saldo no banco
+  await updateClientPoints(clientId, newBalance);
 
-    // Registra a transação no histórico (usando a descrição do brinde)
-    await addTransaction({
-        client_id: clientId,
-        type: TRANSACTION_TYPES.REDEEM,
-        points,
-        reward_id: rewardId,
-        description: reward.description
-    });
+  // Registra a transação no histórico
+  await addTransaction({
+    client_id: clientId,
+    type: TRANSACTION_TYPES.REDEEM,
+    points: reward.points_required, // pontos vêm do brinde
+    reward_id: rewardId,
+    description: description ?? reward.name // usa descrição enviada ou nome do brinde
+  });
 
-    res.status(201).json({ 
-        message: "Pontos resgatados com sucesso", 
-        clientId, 
-        newBalance,
-        rewardDescription: reward.description
-    });
+  res.status(201).json({
+    message: "Pontos resgatados com sucesso",
+    clientId,
+    reward: reward.name,
+    pointsUsed: reward.points_required,
+    newBalance
+  });
 }
 
 
