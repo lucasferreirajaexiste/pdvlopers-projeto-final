@@ -9,7 +9,7 @@ import {
 } from '../controllers/TransactionController.js';
 
 // Importa o controlador de relatórios 
-import { getSummary } from '../controllers/ReportController.js';
+import { getSummary, getSummaryByCategory } from '../controllers/ReportController.js';
 
 const router = express.Router();
 
@@ -28,5 +28,8 @@ router.delete('/transactions/:id', deleteTransaction);
 
 // Rota para o controlador de relatórios
 router.get('/summary', getSummary);
+
+// Rota para o sumário por categoria
+router.get('/summary/by-category', getSummaryByCategory);
 
 export default router;
