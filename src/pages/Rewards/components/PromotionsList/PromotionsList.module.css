@@ -138,17 +138,51 @@
   margin-top: 0.75rem;
 }
 
-.editButton, .pauseButton {
-  background-color: #FFFFFF;
+/* Botões */
+.editButton {
+  background-color:#FFFFFF;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-  color: rgb(23, 23, 23);
+  color: #ffbe0b;
   padding: 0.21rem 0.75rem;
-  border: 1px solid #DDDDDD;
+  border: 1px solid #ffbe0b;
   border-radius: 0.5625rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
 
-.editButton:hover, .pauseButton:hover {
-  background-color: #dddddd82;
+.editButton:hover {
+  background-color: #f7e5b6;
+}
+
+.pauseButton {
+  background-color: #FFFFFF;
+  color: #FB5607; 
+  border: 1px solid #FB5607;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  padding: 0.21rem 0.75rem;
+  border-radius: 0.5625rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  cursor: pointer;
+}
+
+.pauseButton:hover {
+  background-color: #FFF0E8; /* Laranja bem claro */
+}
+
+/* Botão de Reativar */
+.activateButton {
+  background-color: #FFFFFF;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  color: #3A86FF;
+  border: 1px solid #3A86FF;
+  padding: 0.21rem 0.75rem;
+  border-radius: 0.5625rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  cursor: pointer;
+}
+
+.activateButton:hover {
+  background-color: #EBF3FF; /* Azul bem claro */
 }

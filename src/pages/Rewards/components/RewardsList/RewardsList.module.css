@@ -136,7 +136,7 @@
 .cardDescription {
   margin-top: 0;
   color: #64748b;
-  margin-bottom: 16px;
+  margin-bottom: 0.5rem;
 }
 
 .cardButtonActive {
@@ -161,5 +161,12 @@
   background-color:  #ffffff;
   color: #B3B3B4;
   cursor: not-allowed;
-  box-shadow: 1px 1px rgba(100, 116, 139, 0.329);
+  box-shadow: 0px 0.5px 4px rgba(0, 0, 0, 0.1);
+}
+.validityDate {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+  text-align: center;
 }

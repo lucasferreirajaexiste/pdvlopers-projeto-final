@@ -28,7 +28,7 @@ export const PointsOverview = () => {
             <Star className={styles.icon} />
           </div>
           <div className={styles.cardBody}>
-            <div className={styles.cardValue}>45,230</div>
+            <div className={styles.cardValue}>45.230</div>
             <p className={styles.cardDescription}>Distribuídos entre todos os clientes</p>
           </div>
         </div>
@@ -95,8 +95,8 @@ export const PointsOverview = () => {
               {levelsProgress.map(item => (
                 <div key={item.level} className={styles.progressItem}>
                   <div className={styles.progressLabel}>
-                    <span>{item.level.charAt(0).toUpperCase() + item.level.slice(1)} ({item.range} pts)</span>
-                    <span>{item.clients} clientes</span>
+                    <span className={styles.titleProgress}>{item.level.charAt(0).toUpperCase() + item.level.slice(1)} ({item.range} pts)</span>
+                    <span className={styles.titleProgress}>{item.clients} clientes</span>
                   </div>
                   <div className={styles.progressBar}>
                     <div 

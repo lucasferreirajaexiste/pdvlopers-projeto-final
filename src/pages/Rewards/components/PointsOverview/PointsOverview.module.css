@@ -162,6 +162,7 @@
 
 .progressItem {
   margin-bottom: 1rem;
+  
 }
 
 .progressLabel {
@@ -169,6 +170,10 @@
   justify-content: space-between;
   font-size: 0.875rem;
   margin-bottom: 0.25rem;
+}
+
+.titleProgress{
+  color: #020817;
 }
 
 .progressBar {

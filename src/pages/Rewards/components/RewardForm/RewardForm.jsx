@@ -1,7 +1,7 @@
 ﻿import { useState } from 'react';
 import styles from './RewardForm.module.css';
 
-export const RewardForm = ({ onClose }) => {
+export const RewardForm = ({ onClose, onAddReward }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -22,9 +22,14 @@ export const RewardForm = ({ onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Lógica para criar a recompensa
-    console.log('Dados da recompensa:', formData);
-    onClose(); // Fecha o modal após criar
+    
+    if (!formData.validityDate) {
+      alert('Por favor, selecione uma data de validade');
+      return;
+    }
+
+    // Chama a função para adicionar a recompensa
+    onAddReward(formData);
   };
 
   const handleCancel = () => {

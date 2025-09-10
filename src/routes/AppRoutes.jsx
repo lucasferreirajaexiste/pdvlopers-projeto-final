@@ -14,9 +14,9 @@ import { PromotionsPage } from "../pages/Rewards";
 import { PromotionForm } from "../pages/Rewards/components";
 
 export default function AppRoutes(){ 
-    return(
-        <BrowserRouter>
-        <Routes>
+  return(
+    <BrowserRouter>
+      <Routes>
         <Route path="/" element={<Home/>}/>
         <Route path="/clients" element={<Clients/>}/>
         <Route path="/finances" element={<Finances/>}/>
@@ -30,7 +30,7 @@ export default function AppRoutes(){
           <Route path="catalog" element={<RewardsListPage/>}>
             <Route path="new-reward" element={<RewardForm/>}/>
           </Route>
-       
+        
           <Route path="history" element={<HistoryPage/>}/> 
           
           <Route path="promotions" element={<PromotionsPage/>}>
@@ -41,8 +41,8 @@ export default function AppRoutes(){
 
         <Route path="/signup" element={<Signup/>}/>
         <Route path="*" element={<Navigate to="/"/>}/>
-        </Routes>
-        </BrowserRouter>
-    )
+      </Routes>
+    </BrowserRouter>
+  )
 
 }
