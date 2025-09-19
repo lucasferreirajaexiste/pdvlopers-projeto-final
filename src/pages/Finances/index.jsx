@@ -1,7 +1,7 @@
 //styles
 import styles from "./finances.module.css";
 //hook
-import { useState } from "react";
+import { useState, useMemo } from "react";
 //Layout
 import { Layout } from "../../components/Layout/Layout";
 //components
@@ -18,22 +18,37 @@ import { MdOutlineAttachMoney } from "react-icons/md";
 import { LuCalendar, LuPlus, LuTrendingUp, LuTrendingDown } from "react-icons/lu";
 
 export function Finances() {
-
     const [transactions, setTransactions] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [periodo, setPeriodo] = useState(1);
 
-    const totalEntradas = transactions
+    // ===========================
+    // FILTRO: Transações do mês atual
+    // ===========================
+    const transacoesMesAtual = useMemo(() => {
+        const hoje = new Date();
+        const mesAtual = hoje.getMonth();
+        const anoAtual = hoje.getFullYear();
+
+        return transactions.filter((t) => {
+            const data = new Date(t.date);
+            return data.getMonth() === mesAtual && data.getFullYear() === anoAtual;
+        });
+    }, [transactions]);
+
+    // ===========================
+    // CÁLCULOS DOS CARDS
+    // ===========================
+    const totalEntradas = transacoesMesAtual
         .filter(t => t.type === "entrada")
         .reduce((acc, t) => acc + t.amount, 0);
 
-    const totalSaidas = transactions
+    const totalSaidas = transacoesMesAtual
         .filter(t => t.type === "saida")
         .reduce((acc, t) => acc + Math.abs(t.amount), 0);
 
-    const saldo = transactions.reduce((acc, t) => acc + t.amount, 0);
-
-    const totalTransacoes = transactions.length;
+    const saldo = transacoesMesAtual.reduce((acc, t) => acc + t.amount, 0);
+    const totalTransacoes = transacoesMesAtual.length;
 
     const formatCurrency = (value) =>
         new Intl.NumberFormat("pt-BR", {
@@ -41,7 +56,9 @@ export function Finances() {
             currency: "BRL",
         }).format(value);
 
-
+    // ===========================
+    // TABS
+    // ===========================
     const buttons = [
         { id: 'transacoes', label: "Transações" },
         { id: 'graficos', label: "Gráficos" },
@@ -53,12 +70,12 @@ export function Finances() {
                 title="Transações"
                 subtitle="Visualize e gerencie suas transações"
             >
-                {transactions.length > 0 ? (
-                    transactions.map((t) => (
+                {transacoesMesAtual.length > 0 ? (
+                    transacoesMesAtual.map((t) => (
                         <TransactionItem key={t.id} {...t} />
                     ))
                 ) : (
-                    <p>Nenhuma transação cadastrada</p>
+                    <p>Nenhuma transação cadastrada neste mês</p>
                 )}
             </TabContent>
         ),
@@ -72,6 +89,9 @@ export function Finances() {
         ),
     };
 
+    // ===========================
+    // RENDER
+    // ===========================
     return (
         <Layout>
             <div className={styles.container}>
@@ -123,7 +143,6 @@ export function Finances() {
                         icon={<LuCalendar />}
                         color="black"
                     />
-
                 </div>
 
                 <div className={styles.tabs}>
