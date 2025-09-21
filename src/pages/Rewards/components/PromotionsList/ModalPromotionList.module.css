@@ -1,4 +1,12 @@
-﻿/* Overlay - fundo escuro */
+﻿:root{
+  /* Cores da Paleta */
+  --yellowPalette: #ffb60b;
+  --orangePalette: #fb5607;
+  --pinkPalette: #ff006e;
+  --brownPallete: #523a34;
+  --bluePallete: #3a86ff;
+}
+
 .overlay {
   position: fixed;
   top: 0;

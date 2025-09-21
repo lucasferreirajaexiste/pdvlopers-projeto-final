@@ -2,20 +2,34 @@
 import { Star, Gift, Users } from 'lucide-react';
 
 export const PointsOverview = () => {
-  // Dados para os clientes
-  const topClients = [
-    { position: 1, name: "João Silva", badge: "VIP", points: 1250 },
-    { position: 2, name: "Maria Souza", badge: "Gold", points: 1100 },
-    { position: 3, name: "Carlos Oliveira",badge: "Gold" ,points: 980 },
-  ];
+  // Dados que virão do backend (estrutura simples em JS)
+  const overviewData = {
+    totalPoints: 45230,
+    monthlyRedemptions: 127,
+    redemptionGrowth: 23,
+    activeClients: 89,
+    topClients: [
+      { position: 1, name: "João Silva", badge: "VIP", points: 1250 },
+      { position: 2, name: "Maria Souza", badge: "Gold", points: 1100 },
+      { position: 3, name: "Carlos Oliveira", badge: "Gold", points: 980 },
+    ],
+    levelsProgress: [
+      { level: "bronze", range: "0-99", clients: 45, percentage: 45 },
+      { level: "silver", range: "100-499", clients: 30, percentage: 30 },
+      { level: "gold", range: "500-999", clients: 10, percentage: 10 },
+      { level: "vip", range: "1000+", clients: 4, percentage: 4 },
+    ]
+  };
 
-  // Dados para progresso de níveis
-  const levelsProgress = [
-    { level: "bronze", range: "0-99", clients: 45, percentage: 45 },
-    { level: "silver", range: "100-499", clients: 30, percentage: 30 },
-    { level: "gold", range: "500-999", clients: 10, percentage: 10 },
-    { level: "vip", range: "1000+", clients: 4, percentage: 4 },
-  ];
+  // Desestruturando os dados para uso nos componentes
+  const {
+    totalPoints,
+    monthlyRedemptions,
+    redemptionGrowth,
+    activeClients,
+    topClients,
+    levelsProgress
+  } = overviewData;
 
   return (
     <div className={`${styles.tabContent} ${styles.active}`} id="overview">
@@ -28,7 +42,7 @@ export const PointsOverview = () => {
             <Star className={styles.icon} />
           </div>
           <div className={styles.cardBody}>
-            <div className={styles.cardValue}>45.230</div>
+            <div className={styles.cardValue}>{totalPoints.toLocaleString('pt-BR')}</div>
             <p className={styles.cardDescription}>Distribuídos entre todos os clientes</p>
           </div>
         </div>
@@ -40,8 +54,10 @@ export const PointsOverview = () => {
             <Gift className={styles.icon} />
           </div>
           <div className={styles.cardBody}>
-            <div className={styles.cardValue}>127</div>
-            <p className={styles.cardDescription}>+23% em relação ao mês anterior</p>
+            <div className={styles.cardValue}>{monthlyRedemptions}</div>
+            <p className={styles.cardDescription}>
+              +{redemptionGrowth}% em relação ao mês anterior
+            </p>
           </div>
         </div>
 
@@ -52,7 +68,7 @@ export const PointsOverview = () => {
             <Users className={styles.icon} />
           </div>
           <div className={styles.cardBody}>
-            <div className={styles.cardValue}>89</div>
+            <div className={styles.cardValue}>{activeClients}</div>
             <p className={styles.cardDescription}>Com pontos para resgatar</p>
           </div>
         </div>
@@ -77,7 +93,7 @@ export const PointsOverview = () => {
                       {client.badge && <span className={styles.badge}>{client.badge}</span>}
                     </div>
                   </div>
-                  <div className={styles.clientPoints}>{client.points} pts</div>
+                  <div className={styles.clientPoints}>{client.points.toLocaleString('pt-BR')} pts</div>
                 </div>
               ))}
             </div>
@@ -95,7 +111,9 @@ export const PointsOverview = () => {
               {levelsProgress.map(item => (
                 <div key={item.level} className={styles.progressItem}>
                   <div className={styles.progressLabel}>
-                    <span className={styles.titleProgress}>{item.level.charAt(0).toUpperCase() + item.level.slice(1)} ({item.range} pts)</span>
+                    <span className={styles.titleProgress}>
+                      {item.level.charAt(0).toUpperCase() + item.level.slice(1)} ({item.range} pts)
+                    </span>
                     <span className={styles.titleProgress}>{item.clients} clientes</span>
                   </div>
                   <div className={styles.progressBar}>

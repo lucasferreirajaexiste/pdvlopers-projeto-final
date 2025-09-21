@@ -1,4 +1,13 @@
-﻿.container {
+﻿:root{
+  /* Cores da Paleta */
+  --yellowPalette: #ffb60b;
+  --orangePalette: #fb5607;
+  --pinkPalette: #ff006e;
+  --brownPallete: #523a34;
+  --bluePallete: #3a86ff;
+}
+
+.container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;

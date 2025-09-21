@@ -2,16 +2,21 @@
 import styles from './RewardsList.module.css';
 import { Gift } from 'lucide-react';
 import { ModalRewardsList } from './ModalRewardsList';
+import { ModalRewardsDetails } from './ModalRewardsDetails';
 import { RewardForm } from '../RewardForm/RewardForm';
 
 export const RewardsList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedReward, setSelectedReward] = useState(null);
   const [rewardsList, setRewardsList] = useState([
     { id: 1, name: "Desconto 10%", points: 100, available: true, validityDate: null },
     { id: 2, name: "Produto Grátis", points: 250, available: true, validityDate: null },
     { id: 3, name: "Desconto 20%", points: 500, available: false, validityDate: null },
     { id: 4, name: "Brinde Especial", points: 1000, available: false, validityDate: null },
   ]);
+
+  
 
   // Função para verificar e atualizar a disponibilidade das recompensas
   const checkRewardsValidity = () => {
@@ -58,6 +63,18 @@ export const RewardsList = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+  };
+
+  // Função para abrir os detalhes de uma recompensa
+  const handleViewDetails = (reward) => {
+    setSelectedReward(reward);
+    setIsDetailsModalOpen(true);
+  };
+
+  // Função para fechar os detalhes
+  const handleCloseDetails = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedReward(null);
   };
 
   // Função para adicionar uma nova recompensa

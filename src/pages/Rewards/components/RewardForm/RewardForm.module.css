@@ -100,31 +100,63 @@ span {
 }
 
 .cancelButton {
-  background-color: #6b7280;
+  background-color: var(--brownPallete);
   color: white;
   padding: 0.75rem 1.5rem;
-  border: none;
   border-radius: 0.5rem;
+  border: none;
   cursor: pointer;
   font-weight: 500;
+  font-size: 0.875rem;
   transition: background-color 0.2s;
 }
 
 .cancelButton:hover {
-  background-color: #4b5563;
+  background-color: #3d2b27;
 }
 
 .submitButton {
-  background-color: #10b981;
+  background-color: var(--bluePallete);
   color: white;
   padding: 0.75rem 1.5rem;
-  border: none;
   border-radius: 0.5rem;
+  border: none;
   cursor: pointer;
   font-weight: 500;
+  font-size: 0.875rem;
   transition: background-color 0.2s;
 }
 
 .submitButton:hover {
-  background-color: #059669;
+  background-color: #1b64da;
+}.cancelButton {
+  background-color: var(--brownPallete);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+}
+
+.cancelButton:hover {
+  background-color: #3d2b27;
+}
+
+.submitButton {
+  background-color: var(--bluePallete);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+}
+
+.submitButton:hover {
+  background-color: #1b64da;
 }

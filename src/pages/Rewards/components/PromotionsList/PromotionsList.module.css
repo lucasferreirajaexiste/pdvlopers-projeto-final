@@ -1,5 +1,12 @@
 ﻿:root{
   --subtitle: #857373;
+
+  /* Cores da Paleta */
+  --yellowPalette: #ffb60b;
+  --orangePalette: #fb5607;
+  --pinkPalette: #ff006e;
+  --brownPallete: #523a34;
+  --bluePallete: #3a86ff;
 }
 .container {
   width: 100%;
@@ -141,24 +148,26 @@
 /* Botões */
 .editButton {
   background-color:#FFFFFF;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-  color: #ffbe0b;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.144);
+  color: var(--bluePallete);
   padding: 0.21rem 0.75rem;
-  border: 1px solid #ffbe0b;
+  border: 1px solid var(--bluePallete);
   border-radius: 0.5625rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
 
 .editButton:hover {
-  background-color: #f7e5b6;
+  background-color: #3a86ff;
+  color: white;
+  border: none;
 }
 
 .pauseButton {
   background-color: #FFFFFF;
-  color: #FB5607; 
-  border: 1px solid #FB5607;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  color: var(--brownPallete); 
+  border: 1px solid var(--brownPallete);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.144);
   padding: 0.21rem 0.75rem;
   border-radius: 0.5625rem;
   font-size: 0.875rem;
@@ -167,15 +176,17 @@
 }
 
 .pauseButton:hover {
-  background-color: #FFF0E8; /* Laranja bem claro */
+  background-color: #523a34; 
+   color: white;
+  border: none;
 }
 
 /* Botão de Reativar */
 .activateButton {
   background-color: #FFFFFF;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-  color: #3A86FF;
-  border: 1px solid #3A86FF;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.144);
+  color: var(--orangePalette);
+  border: 1px solid var(--orangePalette);
   padding: 0.21rem 0.75rem;
   border-radius: 0.5625rem;
   font-size: 0.875rem;
@@ -184,5 +195,7 @@
 }
 
 .activateButton:hover {
-  background-color: #EBF3FF; /* Azul bem claro */
+  background-color: #fb5607;
+  color: white;
+  border: none;
 }
