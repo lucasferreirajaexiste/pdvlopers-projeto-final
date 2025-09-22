@@ -1,0 +1,96 @@
+﻿:root{
+  --border: #e2e8f0;
+}
+
+*{
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.container {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.header{
+  display: flex;
+  gap: 10px;
+}
+
+.title {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+}
+
+.subtitle {
+  color: rgb(107 114 128);
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.item {
+  border-bottom-width: 1px;
+  padding-bottom: 0.5rem;
+}
+
+.itemContent {
+  display: flex;
+  justify-content: space-between;
+  background-color: #FFFFFF;
+  border: 1px solid #E5E5E5;
+  padding: 20px;
+  border-radius: 15px;
+
+}
+
+.itemIcon{
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.backgroundIcon{
+  background-color: #DBFCE7;
+  padding: 12px;
+  border-radius: 100px;
+  display: inline-flex;
+  align-items: center;
+}
+.icon{
+  color: #0EAC49;
+  height: 1.1rem;
+  width: 1.1rem;
+
+}
+
+.client {
+  font-weight: 700;
+}
+
+.reward {
+  color: #737785;
+  font-size: 15px;
+}
+
+.rightContent {
+  text-align: right;
+}
+
+.points {
+  color: rgb(239 68 68);
+  font-weight: 600;
+}
+
+.date {
+  color: rgb(107 114 128);
+}
