@@ -1,6 +1,8 @@
 // routes/promotionRoutes.js
 const express = require("express");
 const router = express.Router();
+const rateLimit = require("express-rate-limit");
+const auth = require("../middleware/authMiddleware");
 
 const supabase = require("../config/database");
 const { sendEmail } = require("../utils/email");
@@ -11,11 +13,18 @@ const isISODate = (v) => !v || !isNaN(Date.parse(v));
 
 const ok = (res, data) => res.json(data);
 const created = (res, data) => res.status(201).json(data);
-const notFound = (res, msg = "Promoção não encontrada") =>
-  res.status(404).json({ error: msg });
+const notFound = (res, msg = "Promoção não encontrada") => res.status(404).json({ error: msg });
 const badReq = (res, msg) => res.status(400).json({ error: msg });
-const fail = (res, err) =>
-  res.status(500).json({ error: err?.message || "Erro interno" });
+const fail = (res, err) => res.status(500).json({ error: err?.message || "Erro interno" });
+
+// ---------- Segmentos ----------
+const escapeHtml = (s = "") =>
+  String(s)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 
 // ---------- Segmentos ----------
 const SEGMENTS = [
@@ -25,8 +34,8 @@ const SEGMENTS = [
   { key: "SILVER", label: "Clientes Silver" },
   { key: "INACTIVE", label: "Clientes inativos" },
 ];
+const SEGMENT_KEYS = new Set(SEGMENTS.map(s => s.key));
 
-// Limiares configuráveis (ENV) com defaults seguros
 const TIER_LIMITS = {
   VIP_MIN: Number.parseInt(process.env.LOYALTY_VIP_MIN || "1000", 10),
   GOLD_MIN: Number.parseInt(process.env.LOYALTY_GOLD_MIN || "500", 10),
@@ -148,6 +157,8 @@ router.get("/segments", async (req, res) => {
   if (!preview) return ok(res, { list: SEGMENTS, limits: TIER_LIMITS });
 
   if (!segment) return badReq(res, "Informe segment para preview");
+  if (!SEGMENT_KEYS.has(segment)) return badReq(res, "segment inválido"); // +++
+
   try {
     const audience = await getAudienceBySegment({ segment });
     return ok(res, {
@@ -160,6 +171,12 @@ router.get("/segments", async (req, res) => {
   }
 });
 
+const sendLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 50,
+  message: { error: "Muitas solicitações de envio. Tente novamente mais tarde." },
+});
+
 /**
  * POST /api/promotions/send-email
  * Body:
@@ -168,45 +185,66 @@ router.get("/segments", async (req, res) => {
  *   - message: string (required) — suporta {{nome}}
  *   - test_only: boolean (opcional) → se true, não envia; só retorna audiência
  */
-router.post("/send-email", async (req, res) => {
-  try {
-    const { segment, subject, message, test_only = false } = req.body || {};
-    if (!segment) return badReq(res, "segment é obrigatório");
-    if (!subject || !message) return badReq(res, "subject e message são obrigatórios");
+router.post("/send-email",
+  auth,          // +++ proteger se desejar
+  sendLimiter,   // +++ rate limit da rota
+  async (req, res) => {
+    try {
+      const { segment, subject, message, test_only = false } = req.body || {};
+      if (!segment) return badReq(res, "segment é obrigatório");
+      if (!SEGMENT_KEYS.has(segment)) return badReq(res, "segment inválido"); // +++
+      if (!subject || !message) return badReq(res, "subject e message são obrigatórios");
 
-    const audience = await getAudienceBySegment({ segment });
+      const audience = await getAudienceBySegment({ segment });
 
-    if (test_only) {
-      return ok(res, {
-        meta: { total: audience.length, segment },
-        sample: audience.slice(0, 20),
-      });
+      // +++ retorno rápido se vazio
+      if (!audience.length) {
+        return ok(res, { segment, total: 0, sent: 0, failed: 0 });
+      }
+
+      if (test_only) {
+        return ok(res, {
+          meta: { total: audience.length, segment },
+          sample: audience.slice(0, 20),
+        });
+      }
+
+      // +++ envio em lotes pra respeitar limites do SMTP (ajuste LOTE se necessário)
+      const LOTE = Number.parseInt(process.env.EMAIL_BATCH_SIZE || "50", 10);
+      let sent = 0, failed = 0;
+
+      for (let i = 0; i < audience.length; i += LOTE) {
+        const chunk = audience.slice(i, i + LOTE);
+
+        const results = await Promise.allSettled(
+          chunk.map((cli) => {
+            if (!cli.email) { failed++; return Promise.resolve(); }
+            const subj = applyTemplate(subject, cli);
+            const txt  = applyTemplate(message, cli);
+            const html = `<p>${escapeHtml(txt).replace(/\n/g, "<br/>")}</p>`; // +++ escapar
+
+            return sendEmail({ to: cli.email, subject: subj, text: txt, html })
+              .then(() => { sent++; })
+              .catch(() => { failed++; });
+          })
+        );
+
+        // (opcional) log por lote
+        if (process.env.NODE_ENV !== "production") {
+          console.log(`[EMAIL_BATCH] ${i}-${i + chunk.length - 1}`, JSON.stringify(results.map(r => r.status), null, 0));
+        }
+
+        // (opcional) pequena pausa entre lotes
+        const pauseMs = Number.parseInt(process.env.EMAIL_BATCH_PAUSE_MS || "0", 10);
+        if (pauseMs > 0) await new Promise(r => setTimeout(r, pauseMs));
+      }
+
+      return ok(res, { segment, total: audience.length, sent, failed });
+    } catch (err) {
+      return fail(res, err);
     }
-
-    let sent = 0, failed = 0;
-    const results = await Promise.allSettled(
-      audience.map((cli) => {
-        if (!cli.email) { failed++; return Promise.resolve(); }
-        const subj = applyTemplate(subject, cli);
-        const txt  = applyTemplate(message, cli);
-        const html = `<p>${txt.replace(/\n/g, "<br/>")}</p>`;
-        return sendEmail({ to: cli.email, subject: subj, text: txt, html })
-          .then(() => { sent++; })
-          .catch(() => { failed++; });
-      })
-    );
-
-    return ok(res, {
-      segment,
-      total: audience.length,
-      sent,
-      failed,
-      results, // opcional: remova em produção se preferir
-    });
-  } catch (err) {
-    return fail(res, err);
   }
-});
+);
 
 // ---------- CRUD BASEADO EM BANCO (canônico) ----------
 
