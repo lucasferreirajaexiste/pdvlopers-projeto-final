@@ -147,10 +147,31 @@ async function getAudienceBySegment({ segment }) {
 // ---------- ROTAS LITERAIS PRIMEIRO (evitam colisão com /:id) ----------
 
 /**
- * GET /api/promotions/segments
- * Query:
- *   - preview=true|false (opcional)
- *   - segment=ALL|VIP|GOLD|SILVER|INACTIVE (opcional; exigido se preview=true)
+ * @swagger
+ * tags:
+ *   name: Promotions
+ *   description: Gestão de promoções e envios
+ */
+
+/**
+ * @swagger
+ * /api/promotions/segments:
+ *   get:
+ *     summary: Listar segmentos e pré-visualizar audiência
+ *     tags: [Promotions]
+ *     parameters:
+ *       - in: query
+ *         name: preview
+ *         schema:
+ *           type: boolean
+ *       - in: query
+ *         name: segment
+ *         schema:
+ *           type: string
+ *           enum: [ALL, VIP, GOLD, SILVER, INACTIVE]
+ *     responses:
+ *       200:
+ *         description: Lista de segmentos ou pré-visualização
  */
 router.get("/segments", async (req, res) => {
   const preview = parseBool(req.query.preview);
@@ -186,6 +207,30 @@ const sendLimiter = rateLimit({
  *   - subject: string (required)
  *   - message: string (required) — suporta {{nome}}
  *   - test_only: boolean (opcional) → se true, não envia; só retorna audiência
+ */
+/**
+ * @swagger
+ * /api/promotions/send-email:
+ *   post:
+ *     summary: Enviar e-mail para segmento de clientes
+ *     tags: [Promotions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [segment, subject, message]
+ *             properties:
+ *               segment: { type: string }
+ *               subject: { type: string }
+ *               message: { type: string }
+ *               test_only: { type: boolean }
+ *     responses:
+ *       200:
+ *         description: Resultado do envio (ou pré-visualização)
  */
 router.post("/send-email",
   auth,          // +++ proteger se desejar
@@ -251,12 +296,31 @@ router.post("/send-email",
 // ---------- CRUD BASEADO EM BANCO (canônico) ----------
 
 /**
- * GET /promotions
- * Query params:
- *  - limit: number (default 20, max 100)
- *  - offset: number (default 0)
- *  - order: "created_at" | "updated_at" (default "created_at")
- *  - dir: "asc" | "desc" (default "desc")
+ * @swagger
+ * /api/promotions:
+ *   get:
+ *     summary: Listar promoções
+ *     tags: [Promotions]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: dir
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lista de promoções com paginação
  */
 router.get("/", async (req, res) => {
   try {
@@ -285,7 +349,22 @@ router.get("/", async (req, res) => {
 });
 
 /**
- * GET /promotions/:id
+ * @swagger
+ * /api/promotions/{id}:
+ *   get:
+ *     summary: Obter promoção por ID
+ *     tags: [Promotions]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Promoção encontrada
+ *       404:
+ *         description: Promoção não encontrada
  */
 router.get("/:id", async (req, res) => {
   try {
@@ -304,15 +383,29 @@ router.get("/:id", async (req, res) => {
 });
 
 /**
- * POST /promotions
- * Body:
- *  - title (string, required)
- *  - description (string, required)
- *  - type (string, optional - ex: "PERCENT", "VALUE", "BOGO")
- *  - conditions (json/text, optional)
- *  - active (boolean, default true)
- *  - start_date (ISO string, optional)
- *  - end_date (ISO string, optional)
+ * @swagger
+ * /api/promotions:
+ *   post:
+ *     summary: Criar promoção
+ *     tags: [Promotions]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [title, description]
+ *             properties:
+ *               title: { type: string }
+ *               description: { type: string }
+ *               type: { type: string }
+ *               conditions: { type: string }
+ *               active: { type: boolean }
+ *               start_date: { type: string, format: date }
+ *               end_date: { type: string, format: date }
+ *     responses:
+ *       201:
+ *         description: Promoção criada
  */
 router.post("/", async (req, res) => {
   try {
@@ -376,8 +469,26 @@ router.post("/", async (req, res) => {
 });
 
 /**
- * PUT /promotions/:id
- * Atualiza campos parciais
+ * @swagger
+ * /api/promotions/{id}:
+ *   put:
+ *     summary: Atualizar promoção
+ *     tags: [Promotions]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Promoção atualizada
  */
 router.put("/:id", async (req, res) => {
   try {
@@ -422,7 +533,20 @@ router.put("/:id", async (req, res) => {
 });
 
 /**
- * DELETE /promotions/:id
+ * @swagger
+ * /api/promotions/{id}:
+ *   delete:
+ *     summary: Remover promoção
+ *     tags: [Promotions]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Promoção removida
  */
 router.delete("/:id", async (req, res) => {
   try {

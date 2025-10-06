@@ -88,6 +88,18 @@ A documentação da API está disponível em:
 - **Desenvolvimento**: http://localhost:3000/api-docs
 - **Produção**: https://api.mercadinhovip.com/api-docs
 
+### Swagger JSON
+
+Além da UI, o JSON OpenAPI também está disponível em:
+
+- http://localhost:3000/api-docs.json
+
+Se a UI do Swagger não carregar por conta de políticas de segurança do Helmet (CSP), desative temporariamente o CSP no `server.js`:
+
+```js
+// app.use(helmet({ contentSecurityPolicy: false }))
+```
+
 ---
 
 ## 🧪 Testes

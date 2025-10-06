@@ -59,7 +59,15 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // ---------- Swagger ----------
-swaggerSetup(app);
+// Monta a UI em /api-docs e expõe /api-docs.json
+// Se o Helmet bloquear a UI por causa de Content-Security-Policy, ajuste:
+// app.use(helmet({ contentSecurityPolicy: false }))
+if (swaggerSetup && typeof swaggerSetup.setup === "function") {
+  swaggerSetup.setup(app, "/api-docs");
+} else if (typeof swaggerSetup === "function") {
+  // compatibilidade com versão antiga
+  swaggerSetup(app);
+}
 
 // ---------- Health / Root ----------
 app.get("/health", (_req, res) => {

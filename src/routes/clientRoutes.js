@@ -10,6 +10,22 @@ const badReq = (res, msg) => res.status(400).json({ error: msg });
 const notFound = (res, msg = "Cliente não encontrado") => res.status(404).json({ error: msg });
 const fail = (res, err) => res.status(500).json({ message: "Erro interno", error: err?.message });
 
+/**
+ * @swagger
+ * tags:
+ *   name: Clients
+ *   description: Operações relacionadas a clientes
+ */
+/**
+ * @swagger
+ * /api/clients:
+ *   get:
+ *     summary: Listar clientes
+ *     tags: [Clients]
+ *     responses:
+ *       200:
+ *         description: Lista de clientes
+ */
 /** GET /api/clients */
 router.get("/", async (_req, res) => {
   try {
@@ -20,6 +36,25 @@ router.get("/", async (_req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/clients/{id}:
+ *   get:
+ *     summary: Obter cliente por ID
+ *     tags: [Clients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do cliente
+ *     responses:
+ *       200:
+ *         description: Cliente encontrado
+ *       404:
+ *         description: Cliente não encontrado
+ */
 /** GET /api/clients/:id */
 router.get("/:id", async (req, res) => {
   try {
@@ -31,6 +66,28 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/clients:
+ *   post:
+ *     summary: Criar um novo cliente
+ *     tags: [Clients]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [nome, cpf]
+ *             properties:
+ *               nome: { type: string }
+ *               cpf: { type: string }
+ *     responses:
+ *       201:
+ *         description: Cliente criado
+ *       409:
+ *         description: "Conflito (ex.: CPF já existe)"
+ */
 /** POST /api/clients */
 router.post("/", async (req, res) => {
   try {
@@ -47,6 +104,31 @@ router.post("/", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/clients/{id}:
+ *   put:
+ *     summary: Atualizar cliente
+ *     tags: [Clients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do cliente
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Cliente atualizado
+ *       404:
+ *         description: Cliente não encontrado
+ */
 /** PUT /api/clients/:id */
 router.put("/:id", async (req, res) => {
   try {
@@ -58,6 +140,25 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/clients/{id}:
+ *   delete:
+ *     summary: Remover cliente
+ *     tags: [Clients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do cliente
+ *     responses:
+ *       200:
+ *         description: Cliente removido
+ *       404:
+ *         description: Cliente não encontrado
+ */
 /** DELETE /api/clients/:id */
 router.delete("/:id", async (req, res) => {
   try {

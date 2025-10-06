@@ -31,19 +31,30 @@ const options = {
         },
       },
     },
+    // aplica security globalmente (padrão para rotas que precisem de auth)
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
-  apis: ["./src/routes/*.js", "./src/models/*.js"],
+  // Use um padrão mais abrangente para capturar rotas e modelos em subpastas
+  apis: ["./src/**/*.js"],
 }
 
 const specs = swaggerJsdoc(options)
 
-module.exports = (app) => {
-  app.use(
-    "/api-docs",
-    swaggerUi.serve,
-    swaggerUi.setup(specs, {
+// Expose a small helper to mount Swagger UI and the raw JSON
+module.exports = {
+  setup: (app, mountPath = "/api-docs") => {
+    app.use(mountPath, swaggerUi.serve, swaggerUi.setup(specs, {
       explorer: true,
       customCss: ".swagger-ui .topbar { display: none }",
-    }),
-  )
+    }))
+
+    // Raw JSON spec (útil para CI, gateways ou exportação automática)
+    app.get(`${mountPath}.json`, (_req, res) => res.json(specs))
+  },
+  specs,
+  options,
 }
