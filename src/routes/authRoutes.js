@@ -7,7 +7,7 @@ const router = express.Router();
 const auth = require("../controllers/auth.controller");
 const twoFA = require("../controllers/2fa.controller");
 
-// Middleware (ajuste o caminho conforme sua árvore real)
+// Middleware
 const authMiddleware = require("../middleware/authMiddleware");
 
 // Helper para propagar erros async ao errorHandler global
@@ -49,6 +49,16 @@ const asyncHandler = (fn) => (req, res, next) => Promise.resolve(fn(req, res, ne
  *           type: string
  */
 
+// Limiter opcional específico para endpoints sensíveis
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// ========== ROTAS PÚBLICAS ==========
+
 /**
  * @swagger
  * /api/auth/register:
@@ -72,28 +82,9 @@ const asyncHandler = (fn) => (req, res, next) => Promise.resolve(fn(req, res, ne
  *     responses:
  *       201:
  *         description: Usuário criado com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       400:
- *         description: Requisição inválida
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  */
+router.post("/register", authLimiter, asyncHandler(auth.register));
 
-// Limiter opcional específico para endpoints sensíveis (além do global)
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-// Rotas públicas
-router.post("/register", authLimiter, asyncHandler(auth.register));     // 201
 /**
  * @swagger
  * /api/auth/login:
@@ -113,14 +104,10 @@ router.post("/register", authLimiter, asyncHandler(auth.register));     // 201
  *     responses:
  *       200:
  *         description: Autenticação bem sucedida
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/AuthResponse'
  *       401:
  *         description: Credenciais inválidas
  */
-router.post("/login", authLimiter, asyncHandler(auth.login));           // 200 (retorna { accessToken, refreshToken, user })
+router.post("/login", authLimiter, asyncHandler(auth.login));
 
 /**
  * @swagger
@@ -139,7 +126,7 @@ router.post("/login", authLimiter, asyncHandler(auth.login));           // 200 (
  *               email: { type: string }
  *     responses:
  *       200:
- *         description: Instruções de recuperação enviadas (mock)
+ *         description: Instruções de recuperação enviadas
  */
 router.post("/forgot-password", authLimiter, asyncHandler(auth.forgotPassword));
 
@@ -161,54 +148,11 @@ router.post("/forgot-password", authLimiter, asyncHandler(auth.forgotPassword));
  *     responses:
  *       200:
  *         description: Novo token de acesso
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/AuthResponse'
  */
 router.post("/refresh", asyncHandler(auth.refreshToken));
 
-// 2FA (mudar generate -> setup; POST pois gera segredo)
-/**
- * @swagger
- * /api/auth/2fa/setup:
- *   post:
- *     summary: Gerar/setup de 2FA para usuário autenticado
- *     tags: [Authentication]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Segredo 2FA (QR code/data)
- */
-router.post("/2fa/setup", authMiddleware, asyncHandler(twoFA.generate2FA));
+// ========== ROTAS PROTEGIDAS (REQUEREM TOKEN JWT) ==========
 
-/**
- * @swagger
- * /api/auth/2fa/verify:
- *   post:
- *     summary: Verificar código 2FA para usuário autenticado
- *     tags: [Authentication]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [token]
- *             properties:
- *               token: { type: string }
- *     responses:
- *       200:
- *         description: 2FA verificado
- *       400:
- *         description: Token inválido
- */
-router.post("/2fa/verify", authMiddleware, asyncHandler(twoFA.verify2FA));
-
-// Rotas protegidas
 /**
  * @swagger
  * /api/auth/me:
@@ -220,13 +164,65 @@ router.post("/2fa/verify", authMiddleware, asyncHandler(twoFA.verify2FA));
  *     responses:
  *       200:
  *         description: Dados do usuário
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
  *       401:
  *         description: Não autorizado
  */
 router.get("/me", authMiddleware, asyncHandler(auth.getMe));
+
+// ========== 2FA (TWO-FACTOR AUTHENTICATION) ==========
+
+/**
+ * @swagger
+ * /api/auth/2fa/generate:
+ *   get:
+ *     summary: Gerar QR Code 2FA para usuário autenticado
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: QR Code e segredo 2FA gerados
+ */
+router.get("/2fa/generate", authMiddleware, asyncHandler(twoFA.generate2FA));
+
+/**
+ * @swagger
+ * /api/auth/2fa/setup:
+ *   post:
+ *     summary: Setup/configurar 2FA (alias de generate)
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: QR Code e segredo 2FA gerados
+ */
+router.post("/2fa/setup", authMiddleware, asyncHandler(twoFA.generate2FA));
+
+/**
+ * @swagger
+ * /api/auth/2fa/verify:
+ *   post:
+ *     summary: Verificar código 2FA
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [token, secret]
+ *             properties:
+ *               token: { type: string }
+ *               secret: { type: string }
+ *     responses:
+ *       200:
+ *         description: 2FA verificado com sucesso
+ *       400:
+ *         description: Token inválido
+ */
+router.post("/2fa/verify", authMiddleware, asyncHandler(twoFA.verify2FA));
 
 module.exports = router;
