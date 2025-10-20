@@ -46,6 +46,12 @@
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
+	background-color: #ffffff;
+	box-shadow: var(--shadow);
+}
+
+.card span {
+	color: #2c3e50 
 }
 
 .cardHeader {

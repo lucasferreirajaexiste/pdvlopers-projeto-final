@@ -1,0 +1,181 @@
+﻿:root{
+  /* Cores da Paleta */
+  --yellowPalette: #ffb60b;
+  --orangePalette: #fb5607;
+  --pinkPalette: #ff006e;
+  --brownPallete: #523a34;
+  --bluePallete: #3a86ff;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 25px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 640px) {
+  .header {
+    flex-direction: row; 
+    align-items: center;
+  }
+}
+
+.title {
+  white-space: noWrap;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.newRewardButton {
+  display: flex;
+  align-items: center;
+  gap: 0.8125rem;
+  padding: 8px 16px;
+  background-color: black;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: noWrap;
+}
+
+.button {
+  background:none;
+  color: white;
+  border: none;
+  font-weight: 500;
+}
+
+.newRewardButton:hover {
+  background-color: rgb(44, 44, 44);
+}
+
+.icon {
+  color: white;
+  width: 18px;
+  height: 18px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+@media (min-width: 480px) {
+  .grid {
+    grid-template-columns: repeat(1, 1fr); 
+  }
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Layout original em desktop */
+    gap: 20px;
+  }
+}
+
+.card {
+  border-radius: 0.9375rem;
+  border: 1px solid #e2e8f0;;
+  box-shadow: var(--shadow);
+  padding: 20px 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color:  #ffffff;
+  overflow: hidden;
+}
+
+.cardDisabled {
+  opacity: 0.6;
+}
+
+.cardHeader {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cardTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.cardStatusActive {
+  background-color: black;
+  color: white;
+  font-size: 14px;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.cardStatusInactive {
+  color: #7B7B7C;
+  font-weight: 500;
+  background-color: #f1f0f0;
+  font-size: 14px;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.cardPoints {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #3b82f6;
+  margin-top: 9px;
+  line-height: normal;
+}
+
+.cardDescription {
+  margin-top: 0;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.cardButtonActive {
+  background-color: black;
+  color: white;
+  cursor: pointer;
+  border: none;
+}
+
+.cardButtonActive , .cardButtonDisabled{
+  width: 100%;
+  padding: 0.65rem;
+  font-weight: 500;
+  border-radius: 9px;
+  font-size: 0.9rem;
+}
+.cardButtonActive:hover {
+  background-color: rgb(44, 44, 44);
+}
+
+.cardButtonDisabled {
+  background-color:  #ffffff;
+  color: #B3B3B4;
+  cursor: not-allowed;
+  box-shadow: 0px 0.5px 4px rgba(0, 0, 0, 0.1);
+}
+.validityDate {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+  text-align: center;
+}

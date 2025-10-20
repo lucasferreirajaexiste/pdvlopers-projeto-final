@@ -21,6 +21,8 @@
 		#523a34ff,
 		#3a86ffff
 	);
+
+	--shadow:  rgba(0, 0, 0, 0.18) 0px 2px 4px;
 }
 
 * {
@@ -50,4 +52,8 @@ button {
   cursor: pointer;
   border: none;
   background: none;
+}
+
+span {
+	color: inherit;
 }

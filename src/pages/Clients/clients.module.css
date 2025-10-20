@@ -1,6 +1,319 @@
-.clients{
-    display:flex;
+.mainContent {
+    display: flex;
+    flex-direction: row;
+}
+
+.clients {
+    flex: 1;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 15px;
+    font-family: Arial, sans-serif;
+    /* background-color: #fffffa; */
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding-left: 17rem;
+}
+
+.headerClientes {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.headerClientes h2 {
+    font-size: xx-large;
+}
+
+.actionsBar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    width: 100%;
+    justify-content: flex-end;
+}
+
+.actionsBar input {
+    flex: 1;
+    max-width: 300px;
+    padding: 10px 14px 10px 38px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background: #fdfdfd url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23999'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z'/%3E%3C/svg%3E") no-repeat 12px center;
+    background-size: 18px;
+    font-size: 15px;
+    color: #444;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.actionsBar input::placeholder {
+    color: #bbb;
+    font-style: italic;
+}
+
+.actionsBar input:focus {
+    outline: none;
+    border-color: #6c63ff;
+    background-color: #fff;
+    box-shadow: 0 0 6px rgba(108, 99, 255, 0.25);
+}
+
+.btnNovoCliente {
+    padding: 8px 15px;
+    background-color: #912f40;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btnNovoCliente:hover {
+    background-color: #702632;
+}
+
+.listaClientes {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.clienteCard {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fff;
+    cursor: pointer;
+  box-shadow: var(--shadow);
+    transition: background 0.2s;
+}
+
+.clienteCard:hover {
+    background-color: #f5f5f5;
+}
+
+.cardLeft {
+    text-align: left;
+    font-weight: bold;
+    padding-right: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 18px;
+    justify-self: left;
+}
+
+.cardCenter {
+    display: flex;
+    justify-content: center;
+    justify-self: center;
+}
+
+.pontuacao {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background-color: lightgray;
+    color: black;
+    font-weight: bold;
+    text-align: center;
+    min-width: 80px;
+    font-size: 12px;
+}
+
+.cardActions {
+    display: flex;
+    gap: 10px;
+    justify-self: end;
+}
+
+.cardActions button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: #912f40;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.cardActions button:hover {
+    background-color: #702632;
+}
+
+.clienteCardVazio {
+    width: 100%;
+    height: 55px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fff;
+    cursor: pointer;
+  box-shadow: var(--shadow);
+    transition: background 0.2s;
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+}
+
+.modal {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 45%;
+    max-width: 900px;
+}
+
+.modal h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: x-large;
+}
+
+.formCadastro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-left: 15px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.campo label {
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.campo input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.nome input {
+    width: 400px;
+    background-color: #f9f9f9;
+}
+
+.cpf input {
+    width: 200px;
+    text-align: center;
+}
+
+.email input {
+    width: 400px;
+}
+
+.celular input {
+    width: 200px;
+}
+
+.fixo input {
+    width: 180px;
+}
+
+.logradouro input {
+    width: 320px;
+}
+
+.numero input {
+    width: 80px;
+}
+
+.bairro input {
+    width: 200px;
+}
+
+.cidade input {
+    width: 200px;
+}
+
+.estado input {
+    width: 60px;
+    text-transform: uppercase;
+}
+
+.cep input {
+    width: 110px;
+    text-align: center;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modalActions button {
+    background: #912f40;
+    color: white;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.paginacao {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin-top: 15px 0;
+}
+
+.paginacao button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: #912f40;
+    color: white;
+    cursor: pointer;
+}
+
+.paginacao button:hover {
+    background-color: #702632;
+}
+
+.ativo {
+    background-color: #4caf50;
+}
+
+.erro {
+    color: #d93025;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+    transition: opacity 0.3s ease;
 }
