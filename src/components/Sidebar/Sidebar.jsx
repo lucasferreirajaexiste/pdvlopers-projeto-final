@@ -26,6 +26,7 @@ const mockUser = {
 };
 
 export function Sidebar() {
+
   const [user] = useState(mockUser);
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,6 +50,7 @@ export function Sidebar() {
         </div>
       </div>
 
+
       <nav className={styles.menuGroup}>
         <p className={styles.menuGroupLabel}>Menu Principal</p>
         {menuItems.map((item) => {
@@ -57,9 +59,8 @@ export function Sidebar() {
           return (
             <div key={item.title} className={styles.menuItem}>
               <button
-                className={`${styles.menuLink} ${
-                  isActive ? styles.menuLinkActive : ""
-                }`}
+                className={`${styles.menuLink} ${isActive ? styles.menuLinkActive : ""
+                  }`}
                 onClick={() => {
                   setActiveUrl(item.url);
                   navigate(item.url);
@@ -84,6 +85,6 @@ export function Sidebar() {
           Sair
         </button>
       </div>
-    </aside>
+    </aside >
   );
 }

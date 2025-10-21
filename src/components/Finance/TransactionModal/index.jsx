@@ -1,6 +1,9 @@
 import { useState } from "react";
 import styles from './TransactionModal.module.css'
 import { Header } from "../Header";
+import clientsData from '../../../data/mockClients.json'
+import { FaSearch } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom'
 
 export function TransactionModal({ onSave, onClose }) {
     const [formData, setFormData] = useState({
@@ -11,6 +14,11 @@ export function TransactionModal({ onSave, onClose }) {
         amount: ""
     });
 
+    const [somarPontos, setSomarPontos] = useState("não");
+    const [cpfCliente, setCpfCliente] = useState("");
+    const [selectedClient, setSelectedClient] = useState(null);
+    const navigate = useNavigate();
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -18,15 +26,20 @@ export function TransactionModal({ onSave, onClose }) {
         const newTransaction = {
             id: Date.now(),
             ...formData,
-            // Se for saída, deixa negativo
             amount: formData.type === "saida" ? -Math.abs(amountValue) : Math.abs(amountValue),
+            cliente: somarPontos === "sim" ? selectedClient : null
         };
 
-        console.log("Nova transação:", newTransaction); // para verificar
+        console.log("Nova transação:", newTransaction);
         onSave(newTransaction);
         onClose();
     };
 
+    const handleBuscarCliente = () => {
+        const cpfFormatado = cpfCliente.replace(/\D/g, "");
+        const client = clientsData.find(c => c.cpf.replace(/\D/g, "") === cpfFormatado);
+        setSelectedClient(client || null);
+    };
 
     return (
         <div className={styles.overlay}>
@@ -40,6 +53,66 @@ export function TransactionModal({ onSave, onClose }) {
                 </div>
 
                 <form onSubmit={handleSubmit} className={styles.form}>
+
+                    {/* Somar Pontos */}
+                    <div className={styles.field}>
+                        <label>Deseja somar pontos?</label>
+                        <div className={styles.radioGroup}>
+                            <label className={styles.radioLabel}>
+                                <input
+                                    type="radio"
+                                    value="sim"
+                                    checked={somarPontos === "sim"}
+                                    onChange={(e) => setSomarPontos(e.target.value)}
+                                />
+                                Sim
+                            </label>
+                            <label className={styles.radioLabel}>
+                                <input
+                                    type="radio"
+                                    value="não"
+                                    checked={somarPontos === "não"}
+                                    onChange={(e) => setSomarPontos(e.target.value)}
+                                />
+                                Não
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* Buscar Cliente */}
+                    {somarPontos === "sim" && (
+                        <div className={styles.field}>
+                            <label>CPF do Cliente</label>
+                            <div className={styles.cpfSearch}>
+                                <input
+                                    type="text"
+                                    placeholder="Digite o CPF"
+                                    value={cpfCliente}
+                                    onChange={(e) => setCpfCliente(e.target.value)}
+                                />
+                                <button className={styles.buttonSearchClient} type="button" onClick={handleBuscarCliente}><FaSearch /></button>
+                            </div>
+
+                            {/* Botão para cadastrar cliente */}
+                            <button
+                                type="button"
+                                className={styles.buttonAddClient}
+                                onClick={() => navigate("/clients")}
+                            >
+                                Cadastrar Cliente
+                            </button>
+
+                            {selectedClient && (
+                                <div className={styles.clientInfo}>
+                                    <p>Nome: {selectedClient.nome}</p>
+                                    <p>Email: {selectedClient.email}</p>
+                                    <p>CPF: {selectedClient.cpf}</p>
+                                    <p>Telefone: {selectedClient.telefone}</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
 
                     {/* Tipo */}
                     <div className={styles.field}>
@@ -108,7 +181,7 @@ export function TransactionModal({ onSave, onClose }) {
                     {/* Botões */}
                     <div className={styles.buttons}>
                         <button type="button" className={styles.cancel} onClick={onClose}>Cancelar</button>
-                        <button type="submit" className={styles.save}>Registar</button>
+                        <button type="submit" className={styles.save}>Registrar</button>
                     </div>
                 </form>
             </div>

@@ -1,7 +1,10 @@
+//styles
 import styles from "./finances.module.css";
-
-import { useState } from "react";
-
+//hook
+import { useState, useMemo } from "react";
+//Layout
+import { Layout } from "../../components/Layout/Layout";
+//components
 import { Button } from "../../components/Finance/Button";
 import { TransactionCard } from "../../components/Finance/TransactionCard";
 import { Tabs } from "../../components/Finance/Tabs";
@@ -10,28 +13,38 @@ import { TransactionItem } from "../../components/Finance/TransactionItem";
 import { TransactionList } from "../../components/Finance/TransactionList";
 import { Header } from "../../components/Finance/Header";
 import { TransactionModal } from "../../components/Finance/TransactionModal";
-
-import { FaPlus } from "react-icons/fa";
-import { FaArrowTrendUp, FaArrowTrendDown } from "react-icons/fa6";
+//icons
 import { MdOutlineAttachMoney } from "react-icons/md";
-import { CiCalendar } from "react-icons/ci";
-import { Layout } from "../../components/Layout/Layout";
+import { LuCalendar, LuPlus, LuTrendingUp, LuTrendingDown } from "react-icons/lu";
 
 export function Finances() {
   const [transactions, setTransactions] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [periodo, setPeriodo] = useState(1);
 
-  const totalEntradas = transactions
-    .filter((t) => t.type === "entrada")
+  // FILTRO: Transações do mês atual
+  const transacoesMesAtual = useMemo(() => {
+    const hoje = new Date();
+    const mesAtual = hoje.getMonth();
+    const anoAtual = hoje.getFullYear();
+
+    return transactions.filter((t) => {
+      const data = new Date(t.date);
+      return data.getMonth() === mesAtual && data.getFullYear() === anoAtual;
+    });
+  }, [transactions]);
+
+  // CÁLCULOS DOS CARDS
+  const totalEntradas = transacoesMesAtual
+    .filter(t => t.type === "entrada")
     .reduce((acc, t) => acc + t.amount, 0);
 
-  const totalSaidas = transactions
-    .filter((t) => t.type === "saida")
+  const totalSaidas = transacoesMesAtual
+    .filter(t => t.type === "saida")
     .reduce((acc, t) => acc + Math.abs(t.amount), 0);
 
-  const saldo = transactions.reduce((acc, t) => acc + t.amount, 0);
-
-  const totalTransacoes = transactions.length;
+  const saldo = transacoesMesAtual.reduce((acc, t) => acc + t.amount, 0);
+  const totalTransacoes = transacoesMesAtual.length;
 
   const formatCurrency = (value) =>
     new Intl.NumberFormat("pt-BR", {
@@ -39,9 +52,10 @@ export function Finances() {
       currency: "BRL",
     }).format(value);
 
+  // TABS
   const buttons = [
-    { id: "transacoes", label: "Transações" },
-    { id: "graficos", label: "Gráficos" },
+    { id: 'transacoes', label: "Transações" },
+    { id: 'graficos', label: "Gráficos" },
   ];
 
   const contents = {
@@ -50,16 +64,21 @@ export function Finances() {
         title="Transações"
         subtitle="Visualize e gerencie suas transações"
       >
-        {transactions.length > 0 ? (
-          transactions.map((t) => <TransactionItem key={t.id} {...t} />)
+        {transacoesMesAtual.length > 0 ? (
+          transacoesMesAtual.map((t) => (
+            <TransactionItem key={t.id} {...t} />
+          ))
         ) : (
-          <p>Nenhuma transação cadastrada</p>
+          <p>Nenhuma transação cadastrada neste mês</p>
         )}
       </TabContent>
     ),
     graficos: (
-      <TabContent title="Gráficos" subtitle="Acompanhe o desempenho financeiro">
-        <TransactionList />
+      <TabContent
+        title="Lucro vs Prejuízo"
+        subtitle="Comparativo de transações dos últimos meses"
+      >
+        <TransactionList periodo={periodo} setPeriodo={setPeriodo} transactions={transactions} />
       </TabContent>
     ),
   };
@@ -73,11 +92,7 @@ export function Finances() {
             subtitle="Controle suas finanças e fluxo de caixa"
           />
           <div>
-            <Button
-              icon={<FaPlus />}
-              text="Nova Transação"
-              onClick={() => setShowModal(true)}
-            />
+            <Button icon={<LuPlus />} text="Nova Transação" onClick={() => setShowModal(true)} />
 
             {showModal && (
               <TransactionModal
@@ -95,14 +110,14 @@ export function Finances() {
             title="Total Entradas"
             amount={formatCurrency(totalEntradas)}
             subtitle="Este mês"
-            icon={<FaArrowTrendUp />}
+            icon={<LuTrendingUp />}
             color="green"
           />
           <TransactionCard
             title="Total Saídas"
             amount={formatCurrency(totalSaidas)}
             subtitle="Este mês"
-            icon={<FaArrowTrendDown />}
+            icon={<LuTrendingDown />}
             color="red"
           />
           <TransactionCard
@@ -116,7 +131,7 @@ export function Finances() {
             title="Transações"
             amount={totalTransacoes}
             subtitle="Este mês"
-            icon={<CiCalendar />}
+            icon={<LuCalendar />}
             color="black"
           />
         </div>

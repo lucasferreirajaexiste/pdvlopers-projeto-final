@@ -45,70 +45,26 @@ select {
     font-size: 0.8rem;
 }
 
-/* Agrupa os radios e adiciona espaçamento */
-.radioGroup {
+textarea {
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    min-height: 120px;
+    resize: vertical;
+    transition: border 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+
+textarea:focus {
+    border-color: gray;
+    box-shadow: 0 0 5px gray;
+}
+
+.textareaWarning {
     display: flex;
-    gap: 1.5rem;
-    /* espaço entre os radios */
-    margin-top: 0.5rem;
-}
-
-/* Espaçamento entre círculo e label */
-.radioLabel {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    /* distância entre o círculo e o texto */
-}
-
-/* Input e botão lado a lado */
-.cpfSearch {
-    display: flex;
-    gap: 0.5rem;
-    /* espaço entre input e botão */
-    margin-top: 0.5rem;
-}
-
-.buttonAddClient {
-    margin-top: 0.4rem;
-    padding: 8px 12px;
-    background-color: #000;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-
-    width: 183px;
-}
-
-.buttonAddClient:hover {
-    background-color: #2a2a2aff;
-}
-
-/* Informações do cliente com leve margem */
-.clientInfo {
-    margin-top: 0.5rem;
-    background-color: #f9f9f9;
-    padding: 0.5rem;
-    border-radius: 5px;
-    font-size: 1rem;
-    color: #555;
-}
-
-.buttonSearchClient {
-    background-color: #000;
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    font-size: 14px;
+    justify-content: space-between;
+    margin: 0;
 }
 
 .buttons {
