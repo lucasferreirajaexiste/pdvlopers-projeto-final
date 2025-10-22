@@ -61,11 +61,15 @@
 	font-weight: 600;
 }
 
-.cardContent {
-	display: flex;
-	flex-direction: column;
-	gap: 0.25rem;
+.cardContent strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  word-break: break-word; 
+  white-space: normal;  
+  max-width: 100%;
 }
+
 
 .cardAmount {
 	font-size: 1.5rem;
