@@ -42,30 +42,47 @@ async function ensureClientExists(clientId) {
   const id = Number(clientId);
   if (!Number.isInteger(id) || id <= 0) return { exists: false, id: null };
 
-  const { data, error } = await supabase
-    .from("clientes")
-    .select("id")
-    .eq("id", id)
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from("clientes")
+      .select("id")
+      .eq("id", id)
+      .maybeSingle(); // evita throw quando não encontrado
 
-  if (error || !data) return { exists: false, id };
-  return { exists: true, id };
+    if (error) {
+      console.error("ensureClientExists supabase error:", error);
+      return { exists: false, id };
+    }
+    if (!data) return { exists: false, id };
+    return { exists: true, id: data.id };
+  } catch (err) {
+    console.error("ensureClientExists unexpected error:", err);
+    return { exists: false, id };
+  }
 }
 
 async function getBalance(clientId) {
   const id = Number(clientId);
-  const { data, error } = await supabase
-    .from("loyalty_transactions")
-    .select("type, points")
-    .eq("client_id", id);
+  try {
+    const { data, error } = await supabase
+      .from("loyalty_transactions")
+      .select("type, points")
+      .eq("client_id", id);
 
-  if (error) throw new Error(error.message);
+    if (error) {
+      console.error("getBalance supabase error:", error);
+      throw new Error(error.message || "Erro ao calcular saldo");
+    }
 
-  const total = (data || []).reduce(
-    (acc, r) => acc + (r.type === "earn" ? r.points : -r.points),
-    0
-  );
-  return total;
+    const total = (data || []).reduce(
+      (acc, r) => acc + (r.type === "earn" ? r.points : -r.points),
+      0
+    );
+    return total;
+  } catch (err) {
+    console.error("getBalance unexpected error:", err);
+    throw err;
+  }
 }
 
 // -------------------- Controllers --------------------
@@ -82,6 +99,7 @@ async function getClientPoints(req, res) {
     const points = await getBalance(id);
     return res.json({ clientId: id, points });
   } catch (err) {
+    console.error("getClientPoints error:", err);
     return res.status(500).json({ error: err.message || "Erro interno" });
   }
 }
@@ -110,7 +128,10 @@ async function addPoints(req, res) {
       .select()
       .single();
 
-    if (error) return res.status(400).json({ error: error.message });
+    if (error) {
+      console.error("addPoints supabase insert error:", error);
+      return res.status(400).json({ error: error.message || "Erro ao registrar pontos" });
+    }
 
     // saldo atualizado
     const newBalance = await getBalance(client_id);
@@ -123,6 +144,7 @@ async function addPoints(req, res) {
     if (err.isJoi) {
       return res.status(400).json({ error: err.details.map(d => d.message).join(", ") });
     }
+    console.error("addPoints unexpected error:", err);
     return res.status(500).json({ error: err.message || "Erro interno" });
   }
 }
@@ -145,9 +167,13 @@ async function redeemPoints(req, res) {
       .from("rewards")
       .select("*")
       .eq("id", rewardId)
-      .single();
+      .maybeSingle();
 
-    if (rewardErr || !reward) return res.status(404).json({ error: "Brinde não encontrado" });
+    if (rewardErr) {
+      console.error("redeemPoints reward lookup error:", rewardErr);
+      return res.status(500).json({ error: rewardErr.message || "Erro ao buscar brinde" });
+    }
+    if (!reward) return res.status(404).json({ error: "Brinde não encontrado" });
 
     // verifica saldo
     const current = await getBalance(client_id);
@@ -168,7 +194,10 @@ async function redeemPoints(req, res) {
       .select()
       .single();
 
-    if (error) return res.status(400).json({ error: error.message });
+    if (error) {
+      console.error("redeemPoints supabase insert error:", error);
+      return res.status(400).json({ error: error.message || "Erro ao registrar resgate" });
+    }
 
     const newBalance = await getBalance(client_id);
     return res.status(201).json({
@@ -181,6 +210,7 @@ async function redeemPoints(req, res) {
     if (err.isJoi) {
       return res.status(400).json({ error: err.details.map(d => d.message).join(", ") });
     }
+    console.error("redeemPoints unexpected error:", err);
     return res.status(500).json({ error: err.message || "Erro interno" });
   }
 }
@@ -191,9 +221,13 @@ async function redeemPoints(req, res) {
 async function listRewards(_req, res) {
   try {
     const { data, error } = await supabase.from("rewards").select("*").order("created_at", { ascending: false });
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) {
+      console.error("listRewards supabase error:", error);
+      return res.status(500).json({ error: error.message || "Erro ao listar brindes" });
+    }
     return res.json(data || []);
   } catch (err) {
+    console.error("listRewards unexpected error:", err);
     return res.status(500).json({ error: err.message || "Erro interno" });
   }
 }
@@ -212,10 +246,16 @@ async function createReward(req, res) {
       .select()
       .single();
 
-    if (error) return res.status(400).json({ error: error.message });
+    if (error) {
+      console.error("createReward supabase insert error:", error);
+      return res.status(400).json({ error: error.message || "Erro ao criar brinde" });
+    }
     return res.status(201).json(data);
   } catch (err) {
-    if (err.isJoi) return res.status(400).json({ error: err.details.map(d => d.message).join(", ") });
+    if (err.isJoi) {
+      return res.status(400).json({ error: err.details.map(d => d.message).join(", ") });
+    }
+    console.error("createReward unexpected error:", err);
     return res.status(500).json({ error: err.message || "Erro interno" });
   }
 }
@@ -226,10 +266,15 @@ async function createReward(req, res) {
 async function getRewardById(req, res) {
   try {
     const { id } = req.params;
-    const { data, error } = await supabase.from("rewards").select("*").eq("id", id).single();
-    if (error || !data) return res.status(404).json({ error: "Brinde não encontrado" });
+    const { data, error } = await supabase.from("rewards").select("*").eq("id", id).maybeSingle();
+    if (error) {
+      console.error("getRewardById supabase error:", error);
+      return res.status(500).json({ error: error.message || "Erro ao buscar brinde" });
+    }
+    if (!data) return res.status(404).json({ error: "Brinde não encontrado" });
     return res.json(data);
   } catch (err) {
+    console.error("getRewardById unexpected error:", err);
     return res.status(500).json({ error: err.message || "Erro interno" });
   }
 }
@@ -247,12 +292,17 @@ async function updateReward(req, res) {
       .update(patch)
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
-    if (error || !data) return res.status(404).json({ error: "Brinde não encontrado ou erro ao atualizar" });
+    if (error) {
+      console.error("updateReward supabase error:", error);
+      return res.status(400).json({ error: error.message || "Erro ao atualizar brinde" });
+    }
+    if (!data) return res.status(404).json({ error: "Brinde não encontrado ou erro ao atualizar" });
     return res.json(data);
   } catch (err) {
     if (err.isJoi) return res.status(400).json({ error: err.details.map(d => d.message).join(", ") });
+    console.error("updateReward unexpected error:", err);
     return res.status(500).json({ error: err.message || "Erro interno" });
   }
 }
@@ -264,9 +314,13 @@ async function deleteReward(req, res) {
   try {
     const { id } = req.params;
     const { error } = await supabase.from("rewards").delete().eq("id", id);
-    if (error) return res.status(404).json({ error: "Brinde não encontrado ou erro ao deletar" });
+    if (error) {
+      console.error("deleteReward supabase error:", error);
+      return res.status(400).json({ error: error.message || "Erro ao deletar brinde" });
+    }
     return res.json({ message: "Brinde deletado com sucesso" });
   } catch (err) {
+    console.error("deleteReward unexpected error:", err);
     return res.status(500).json({ error: err.message || "Erro interno" });
   }
 }
@@ -286,9 +340,13 @@ async function getHistory(req, res) {
       .eq("client_id", id)
       .order("created_at", { ascending: false });
 
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) {
+      console.error("getHistory supabase error:", error);
+      return res.status(500).json({ error: error.message || "Erro ao buscar histórico" });
+    }
     return res.json(data || []);
   } catch (err) {
+    console.error("getHistory unexpected error:", err);
     return res.status(500).json({ error: err.message || "Erro interno" });
   }
 }

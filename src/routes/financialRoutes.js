@@ -3,12 +3,20 @@ import express from "express";
 import {
   createTransaction,
   getTransactions,
+  getTransaction,
   updateTransaction,
   deleteTransaction,
+  getCategories,
 } from "../controllers/TransactionController.js";
 import { getSummary, getSummaryByCategory } from "../controllers/ReportController.js";
 
 const router = express.Router();
+
+// logger para depuração (remova/ajuste em produção)
+router.use((req, _res, next) => {
+  console.log(`[financialRoutes] ${req.method} ${req.originalUrl} - body:`, req.body);
+  next();
+});
 
 /**
  * @swagger
@@ -44,14 +52,16 @@ const router = express.Router();
  *                 example: 150.75
  *               type:
  *                 type: string
- *                 enum: [credit, debit]
+ *                 enum: [credit, debit, entrada, saida]
  *                 example: credit
  *               transaction_date:
  *                 type: string
  *                 format: date
  *                 example: 2025-01-31
  *               category_id:
- *                 type: integer
+ *                 oneOf:
+ *                   - type: integer
+ *                   - type: string
  *                 nullable: true
  *                 example: 3
  *     responses:
@@ -80,7 +90,7 @@ router.post("/transactions", createTransaction);
  *         name: type
  *         schema:
  *           type: string
- *           enum: [credit, debit]
+ *           enum: [credit, debit, entrada, saida]
  *         description: Filtra por tipo de transacao
  *       - in: query
  *         name: from
@@ -105,10 +115,15 @@ router.post("/transactions", createTransaction);
 router.get("/transactions", getTransactions);
 
 /**
+ * GET single transaction by id
+ */
+router.get("/transactions/:id", getTransaction);
+
+/**
  * @swagger
  * /api/financial/transactions/{id}:
  *   put:
- *     summary: Atualizar transacao financeira
+ *     summary: Atualizar transacao financeira (substituir/atualizar)
  *     tags: [Financial]
  *     parameters:
  *       - in: path
@@ -131,12 +146,14 @@ router.get("/transactions", getTransactions);
  *                 format: float
  *               type:
  *                 type: string
- *                 enum: [credit, debit]
+ *                 enum: [credit, debit, entrada, saida]
  *               transaction_date:
  *                 type: string
  *                 format: date
  *               category_id:
- *                 type: integer
+ *                 oneOf:
+ *                   - type: integer
+ *                   - type: string
  *                 nullable: true
  *     responses:
  *       200:
@@ -149,6 +166,8 @@ router.get("/transactions", getTransactions);
  *         description: Erro interno do servidor
  */
 router.put("/transactions/:id", updateTransaction);
+// also accept PATCH for partial updates
+router.patch("/transactions/:id", updateTransaction);
 
 /**
  * @swagger
@@ -174,6 +193,20 @@ router.put("/transactions/:id", updateTransaction);
  *         description: Erro interno do servidor
  */
 router.delete("/transactions/:id", deleteTransaction);
+
+/**
+ * @swagger
+ * /api/financial/categories:
+ *   get:
+ *     summary: Listar categorias disponiveis
+ *     tags: [Financial]
+ *     responses:
+ *       200:
+ *         description: Lista de categorias
+ *       500:
+ *         description: Erro interno do servidor
+ */
+router.get("/categories", getCategories);
 
 /**
  * @swagger

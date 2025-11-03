@@ -1,14 +1,12 @@
-// Modelo de transação financeira (Back 5 - Helen)
-const financialTransactionSchema = {
-  id: "uuid",
-  type: "enum (income, expense)",
-  category: "string",
-  amount: "decimal",
+export const financialTransactionSchema = {
+  id: "string (BIGINT as string)",
+  type: "enum ('entrada', 'saida')",
+  categoryId: "number | null (BIGINT)",
+  amount: "number (2 decimals) | string (if returned as NUMERIC string)",
   description: "string",
-  date: "date",
-  client_id: "uuid (foreign key, nullable)",
-  created_at: "timestamp",
-  updated_at: "timestamp",
-}
+  date: "string (YYYY-MM-DD)",
+  createdAt: "string (ISO timestamp)",
+  updatedAt: "string (ISO timestamp) | undefined",
+};
 
-module.exports = { financialTransactionSchema }
+export default financialTransactionSchema;
