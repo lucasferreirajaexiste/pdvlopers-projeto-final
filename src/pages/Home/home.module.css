@@ -1,21 +1,11 @@
 .container {
-	padding: 1rem;
 	display: flex;
 	flex-direction: column;
 	gap: 1.5rem;
 }
 
-.title {
-	font-size: 2rem;
-	font-weight: 700;
-}
-
-.subtitle {
-	color: #6b7280;
-	margin-bottom: 1rem;
-}
-
 .grid3 {
+	height: 150px;
 	display: grid;
 	grid-template-columns: repeat(1, 1fr);
 	gap: 1rem;
@@ -40,18 +30,48 @@
 }
 
 .card {
-	border: 1px solid #e5e7eb;
-	border-radius: 0.5rem;
-	padding: 1rem;
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-	background-color: #ffffff;
-	box-shadow: var(--shadow);
+border-radius: 0.5rem;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+
+  background: rgba(42, 42, 42, 0.65);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  box-shadow: var(--shadow);
 }
 
-.card span {
-	color: #2c3e50 
+.card::after {
+  content: "";
+  position: absolute;
+  top: -30%;
+  right: -30%;
+  width: 180px;
+  height: 180px;
+  background: linear-gradient(90deg, var(--primary), transparent);
+  opacity: 0.12;
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+
+.cardValue p {
+	text-align: end;
+	color: var(--foreground);
+	font-size: 30px;
+}
+
+.card p {
+	text-align: end;
+	color: var(--foreground);
 }
 
 .cardHeader {
@@ -59,6 +79,18 @@
 	justify-content: space-between;
 	align-items: center;
 	font-weight: 600;
+	color: var(--foreground) ;
+
+}
+
+.cardContent {
+  display: block;
+  font-size: 1rem;
+  word-break: break-word; 
+  white-space: normal;  
+  max-width: 100%;
+	color: var(--foreground) ;
+
 }
 
 .cardContent strong {
@@ -68,17 +100,21 @@
   word-break: break-word; 
   white-space: normal;  
   max-width: 100%;
+	color: var(--foreground) ;
+
 }
 
 
 .cardAmount {
 	font-size: 1.5rem;
 	font-weight: 700;
+	color: var(--foreground);
+
 }
 
 .cardInfo {
 	font-size: 0.75rem;
-	color: #6b7280;
+	color: var(--foreground);
 }
 
 .item {
@@ -90,6 +126,92 @@
 
 .badge {
 	font-size: 0.75rem;
-	color: #2563eb;
-	font-weight: 600;
+	border-radius: 6px;
+	padding: 4px;
+	background: var(--sidebar-primary);
+	color: var(--sidebar-primary-foreground);
+}
+
+
+.clientItem {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s ease;
+}
+
+.promoItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s ease;
+}
+
+.clientItem:last-child {
+  border-bottom: none;
+}
+
+.clientItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+
+.clientInfo {
+  display: flex;
+  flex-direction: column;
+  color: var(--foreground);
+  overflow: hidden;
+}
+
+.clientName {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--foreground);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.clientPoints,
+.clientDate {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.clientRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.clientRow .left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; 
+}
+
+.clientRow .right {
+  text-align: right;
+}
+
+.avatar {
+   width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }

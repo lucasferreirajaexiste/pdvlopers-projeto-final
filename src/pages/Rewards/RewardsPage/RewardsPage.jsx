@@ -14,12 +14,6 @@ export const RewardsPage = () => {
   return (
     <Layout>
       <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Programa de Fidelidade</h1>
-          <p className={styles.description}>
-            Gerencie pontos, recompensas e promoções
-          </p>
-        </div>
 
         <div className={styles.navContainer}>
           <div className={styles.navLinks}>

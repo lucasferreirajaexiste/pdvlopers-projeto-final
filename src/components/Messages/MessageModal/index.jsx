@@ -4,47 +4,74 @@ import { Header } from "../../Finance/Header";
 
 const MAX_MESSAGE_LENGTH = 360;
 
-export function MessageModal({ type, isOpen, onClose }) {
+export function MessageModal({ isOpen, onClose }) {
     const [segment, setSegment] = useState("");
     const [subject, setSubject] = useState("");
     const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
     if (!isOpen) return null;
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
+        if (!segment || !subject || !message) {
+            alert("Preencha todos os campos antes de enviar.");
+            return;
+        }
+
         const data = {
-            tipo: type,
-            segmento: segment,
-            assunto: subject,
-            mensagem: message,
+            segment: segment.toUpperCase(),
+            subject: subject,
+            message: message,
+            test_only: true, // evita envio real de e-mail durante testes
         };
 
-        console.log("Enviando mensagem:", data);
+        try {
+            setLoading(true);
 
-        onClose();
+            const token = localStorage.getItem("token");
 
-        setSegment("");
-        setSubject("");
-        setMessage("");
+            const response = await fetch(
+                `${import.meta.env.VITE_API_URL}/api/promotions/send-email`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(data),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Erro ao enviar mensagem");
+            }
+
+            const result = await response.json();
+            console.log("Mensagem enviada com sucesso:", result);
+            alert("Mensagem enviada com sucesso!");
+
+            // Limpa o modal
+            setSegment("");
+            setSubject("");
+            setMessage("");
+            onClose();
+        } catch (error) {
+            console.error("Erro ao enviar mensagem:", error);
+            alert("Falha ao enviar mensagem. Verifique o console.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div className={styles.overlay}>
             <div className={styles.modal}>
                 <div className={styles.header}>
-                    {type === "Email" ? (
-                        <Header
-                            title="Enviar Email Promocional"
-                            subtitle="Configure sua campanha de email marketing."
-                            size="small"
-                        />
-                    ) : (
-                        <Header
-                            title="Enviar WhatsApp"
-                            subtitle="Configure sua mensagem para WhatsApp"
-                            size="small"
-                        />
-                    )}
+                    <Header
+                        title="Enviar Email Promocional"
+                        subtitle="Configure sua campanha de email marketing."
+                        size="small"
+                    />
                 </div>
 
                 <form
@@ -54,32 +81,30 @@ export function MessageModal({ type, isOpen, onClose }) {
                     }}
                     className={styles.form}
                 >
-
-                    {type === "Email" && (
-                        <div className={styles.field}>
-                            <label>Assunto</label>
-                            <input
-                                type="text"
-                                value={subject}
-                                onChange={(e) => setSubject(e.target.value)}
-                                placeholder="Digite o assunto"
-                            />
-                        </div>
-                    )}
+                    <div className={styles.field}>
+                        <label>Assunto</label>
+                        <input
+                            type="text"
+                            value={subject}
+                            onChange={(e) => setSubject(e.target.value)}
+                            placeholder="Digite o assunto"
+                        />
+                    </div>
 
                     <div className={styles.field}>
                         <label>Segmento</label>
-                        <select value={segment} onChange={(e) => setSegment(e.target.value)}>
+                        <select
+                            value={segment}
+                            onChange={(e) => setSegment(e.target.value)}
+                        >
                             <option value="">Selecione um segmento</option>
-                            <option value="todos">Todos os clientes</option>
-                            <option value="vip">Clientes VIP</option>
-                            <option value="golds">Clientes Golds</option>
-                            <option value="silver">Clientes Silver</option>
-                            <option value="inativos">Clientes Inativos</option>
+                            <option value="ALL">Todos os clientes</option>
+                            <option value="VIP">Clientes VIP</option>
+                            <option value="GOLD">Clientes Gold</option>
+                            <option value="SILVER">Clientes Silver</option>
+                            <option value="INACTIVE">Clientes Inativos</option>
                         </select>
                     </div>
-
-
 
                     <div className={styles.field}>
                         <label>Mensagem</label>
@@ -94,16 +119,27 @@ export function MessageModal({ type, isOpen, onClose }) {
                         />
                         <div className={styles.textareaWarning}>
                             <p>Máximo {MAX_MESSAGE_LENGTH} caracteres</p>
-                            <p>{message.length}/{MAX_MESSAGE_LENGTH}</p>
+                            <p>
+                                {message.length}/{MAX_MESSAGE_LENGTH}
+                            </p>
                         </div>
                     </div>
 
                     <div className={styles.buttons}>
-                        <button type="button" className={styles.cancel} onClick={onClose}>
+                        <button
+                            type="button"
+                            className={styles.cancel}
+                            onClick={onClose}
+                            disabled={loading}
+                        >
                             Cancelar
                         </button>
-                        <button type="submit" className={styles.save}>
-                            Enviar
+                        <button
+                            type="submit"
+                            className={styles.save}
+                            disabled={loading}
+                        >
+                            {loading ? "Enviando..." : "Enviar"}
                         </button>
                     </div>
                 </form>

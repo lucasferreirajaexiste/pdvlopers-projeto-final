@@ -1,6 +1,7 @@
 ﻿import { Outlet } from 'react-router-dom';
 import { PromotionsList } from "./components";
 
+
 export const PromotionsPage = () => {
   return (
     <>

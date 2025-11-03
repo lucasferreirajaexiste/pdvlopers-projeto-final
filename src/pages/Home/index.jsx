@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { DollarSign, Users, Gift, TrendingUp, Star } from "lucide-react";
+import {
+  DollarSign,
+  Users,
+  Gift,
+  TrendingUp,
+  Star,
+  Wallet,
+  Calendar,
+} from "lucide-react";
 import styles from "./home.module.css";
 import { Layout } from "../../components/Layout/Layout";
 import {
@@ -78,20 +86,19 @@ export function Home() {
     fetchData();
   }, []);
 
+  console.log(promotions);
+
   return (
     <Layout>
       <div className={styles.container}>
-        <h1 className={styles.title}>Dashboard</h1>
-        <p className={styles.subtitle}>Visão geral do seu negócio</p>
-
         {/* Cards financeiros */}
         <div className={styles.grid3}>
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <span>Saldo do Dia</span>
-              <DollarSign />
+              <DollarSign color="var(--chart-1)" />
             </div>
-            <div className={styles.cardContent}>
+            <div className={styles.cardValue}>
               <p className={styles.cardAmount}>R$ {sumDay.toFixed(2)}</p>
             </div>
           </div>
@@ -99,9 +106,9 @@ export function Home() {
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <span>Saldo do Mês</span>
-              <TrendingUp />
+              <Calendar color="var(--chart-2)" />
             </div>
-            <div className={styles.cardContent}>
+            <div className={styles.cardValue}>
               <p className={styles.cardAmount}>R$ {sumMonth.toFixed(2)}</p>
             </div>
           </div>
@@ -109,9 +116,9 @@ export function Home() {
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <span>Total Acumulado</span>
-              <DollarSign />
+              <Wallet color="var(--chart-3)" />
             </div>
-            <div className={styles.cardContent}>
+            <div className={styles.cardValue}>
               <p className={styles.cardAmount}>R$ {sumAll.toFixed(2)}</p>
             </div>
           </div>
@@ -123,15 +130,26 @@ export function Home() {
             <div className={styles.cardHeader}>
               <Star /> Top 5 Clientes do Mês
             </div>
+
             <div className={styles.cardContent}>
-              {topClients.map((client, index) => (
-                <div key={client.id} className={styles.item}>
-                  <span>
-                    {index + 1}. {client.nome}
-                  </span>
-                  <span>{client.points} pts</span>
-                </div>
-              ))}
+              {topClients.map((client) => {
+                const initials = client.nome
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .substring(0, 2)
+                  .toUpperCase();
+
+                return (
+                  <div key={client.id} className={styles.clientRow}>
+                    <div className={styles.left}>
+                      <span className={styles.avatar}>{initials}</span>
+                      <span className={styles.clientName}>{client.nome}</span>
+                    </div>
+                    <div className={styles.right}>{client.points} pts</div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -139,16 +157,39 @@ export function Home() {
             <div className={styles.cardHeader}>
               <Gift /> Promoções Ativas
             </div>
+
             <div className={styles.cardContent}>
-              {promotions.map((promo) => (
-                <div key={promo.id} className={styles.item}>
-                  <strong>{promo.title}</strong>
-                  <p>{promo.description}</p>
-                  <span className={styles.badge}>
-                    {promo.active ? "Ativa" : "Inativa"}
-                  </span>
-                </div>
-              ))}
+              {promotions.length > 0 ? (
+                promotions.map((promo) => {
+                  // Calcula dias restantes
+                  const today = new Date();
+                  const endDate = new Date(promo.end_date);
+                  const diffTime = endDate - today;
+                  const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                  return (
+                    <div key={promo.id} className={styles.promoItem}>
+                      <div className={styles.clientInfo}>
+                        <span className={styles.clientName}>{promo.title}</span>
+                        <span className={styles.clientPoints}>
+                          {promo.description}
+                        </span>
+                      </div>
+                      <div className={styles.clientInfo}>
+                        {daysLeft > 0 ? (
+                          <span className={styles.promoDays}>
+                            {daysLeft} dia(s) restante(s)
+                          </span>
+                        ) : (
+                          <span className={styles.promoExpired}>Expirada</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p>Nenhuma promoção ativa.</p>
+              )}
             </div>
           </div>
         </div>
@@ -158,23 +199,36 @@ export function Home() {
           <div className={styles.cardHeader}>
             <Users /> Últimos Clientes Cadastrados
           </div>
+
           <div className={styles.cardContent}>
-            {loadingClients ? (
-              <p>Carregando clientes...</p>
-            ) : clients.length > 0 ? (
-              clients.slice(0, 5).map((client) => (
-                <div key={client.id} className={styles.item}>
-                  <span>{client.nome}</span>
-                  <span>
-                    Cadastrado em{" "}
-                    {new Date(client.created_at).toLocaleDateString("pt-BR")}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p>Nenhum cliente encontrado.</p>
-            )}
+  {loadingClients ? (
+    <p>Carregando clientes...</p>
+  ) : clients.length > 0 ? (
+    clients.slice(0, 5).map((client) => {
+      const initials = client.nome
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .substring(0, 2)
+        .toUpperCase();
+
+      return (
+        <div key={client.id} className={styles.clientRow}>
+          <div className={styles.left}>
+            <span className={styles.avatar}>{initials}</span>
+            <span className={styles.clientName}>{client.nome}</span>
           </div>
+          <div className={styles.right}>
+            {new Date(client.created_at).toLocaleDateString("pt-BR")}
+          </div>
+        </div>
+      );
+    })
+  ) : (
+    <p>Nenhum cliente encontrado.</p>
+  )}
+</div>
+
         </div>
       </div>
     </Layout>

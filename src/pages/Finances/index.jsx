@@ -12,8 +12,6 @@ import { TransactionModal } from "../../components/Finance/TransactionModal";
 import { MdOutlineAttachMoney } from "react-icons/md";
 import { LuCalendar, LuPlus, LuTrendingUp, LuTrendingDown } from "react-icons/lu";
 
-import { getFinancialAll, getCategories } from "../../services/api"; // ajuste o caminho se necessário
-
 export function Finances() {
   const [transactions, setTransactions] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -94,18 +92,24 @@ export function Finances() {
 
   const contents = {
     transacoes: (
-      <TabContent title="Transações" subtitle="Visualize e gerencie suas transações">
-        {loading ? (
-          <p>Carregando...</p>
-        ) : transacoesMesAtual.length > 0 ? (
-          transacoesMesAtual.map((t) => <TransactionItem key={t.id} {...t} />)
+      <TabContent
+        title="Transações"
+        subtitle="Visualize e gerencie suas transações"
+      >
+        {transacoesMesAtual.length > 0 ? (
+          transacoesMesAtual.map((t) => (
+            <TransactionItem key={t.id} {...t} />
+          ))
         ) : (
           <p>Nenhuma transação cadastrada neste mês</p>
         )}
       </TabContent>
     ),
     graficos: (
-      <TabContent title="Lucro vs Prejuízo" subtitle="Comparativo de transações dos últimos meses">
+      <TabContent
+        title="Lucro vs Prejuízo"
+        subtitle="Comparativo de transações dos últimos meses"
+      >
         <TransactionList periodo={periodo} setPeriodo={setPeriodo} transactions={transactions} />
       </TabContent>
     ),
@@ -126,7 +130,10 @@ export function Finances() {
     <Layout>
       <div className={styles.container}>
         <div className={styles.header}>
-          <Header title="Financeiro" subtitle="Controle suas finanças e fluxo de caixa" />
+          <Header
+            title="Financeiro"
+            subtitle="Controle suas finanças e fluxo de caixa"
+          />
           <div>
             <Button icon={<LuPlus />} text="Nova Transação" onClick={() => setShowModal(true)} />
 

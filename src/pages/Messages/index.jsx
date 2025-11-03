@@ -104,12 +104,12 @@ export function Messages() {
   return (
     <Layout>
       <div className={styles.container}>
-        <div className={styles.header}>
+        {/* <div className={styles.header}>
           <Header
             title="Mensagens"
             subtitle="Envie promoções e mensagens para seus clientes"
           />
-        </div>
+        </div> */}
 
         <div className={styles.tabs}>
           <Tabs buttons={buttons} contents={contents} />

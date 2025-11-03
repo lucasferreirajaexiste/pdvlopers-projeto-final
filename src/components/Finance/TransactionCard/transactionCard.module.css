@@ -1,21 +1,42 @@
 .card {
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 16px;
-    box-shadow: var(--shadow);
-    max-width: 240px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: transform 0.2s ease;
+  border-radius: 0.5rem;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
 
-    flex: 1 1 250px;
-    max-width: 100%;
-    min-width: 200px;
+  background: rgba(42, 42, 42, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  padding: 1rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  flex: 1 1 250px;
+  max-width: 100%;
+  min-width: 200px;
 }
 
 .card:hover {
-    transform: scale(1.02);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* efeito de gradiente suave */
+.card::after {
+  content: "";
+  position: absolute;
+  top: -30%;
+  right: -30%;
+  width: 180px;
+  height: 180px;
+  background: linear-gradient(90deg, var(--primary), transparent);
+  opacity: 0.12;
+  filter: blur(60px);
+  pointer-events: none;
 }
 
 .header {
@@ -24,30 +45,37 @@
     align-items: center;
     margin-bottom: 12px;
     font-size: 12px;
+    color: var(--foreground);
+
 }
 
 .icon {
     font-size: 12px;
+    color: var(--foreground);
+
 }
 
 .green {
-    color: green;
+  color: var(--success, #22c55e);
 }
 
 .red {
-    color: red;
+  color: var(--danger, #ef4444);
 }
 
 .black {
-    color: black;
+  color: var(--foreground);
 }
 
 strong {
     font-size: 1.5rem;
+      color: var(--foreground);
+
 }
 
 p {
-    color: #999;
+    color: var(--foreground);
+    opacity: 0.7;
     margin-top: 8px;
     font-size: 12px;
 }

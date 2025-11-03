@@ -12,20 +12,9 @@
     padding: 15px;
     font-family: Arial, sans-serif;
     /* background-color: #fffffa; */
-    min-height: 100vh;
+    min-height: 80vh;
     box-sizing: border-box;
-    padding-left: 17rem;
-}
-
-.headerClientes {
-    width: 100%;
-    text-align: center;
-    padding: 10px;
-    margin-bottom: 20px;
-}
-
-.headerClientes h2 {
-    font-size: xx-large;
+    /* padding-left: 17rem; */
 }
 
 .actionsBar {
@@ -64,15 +53,16 @@
 
 .btnNovoCliente {
     padding: 8px 15px;
-    background-color: #912f40;
-    color: white;
+    background-color: var(--primary);
+    color:  var(--primary-foreground);
     border: none;
     border-radius: 6px;
     cursor: pointer;
 }
 
 .btnNovoCliente:hover {
-    background-color: #702632;
+    background: rgba(255, 190, 11, 0.95) !important;
+    color: var(--sidebar-primary-foreground);
 }
 
 .listaClientes {
@@ -84,23 +74,45 @@
     justify-content: flex-start;
 }
 
+.clienteCardVazio,
 .clienteCard {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    width: 100%;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #fff;
-    cursor: pointer;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: rgba(42, 42, 42, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
   box-shadow: var(--shadow);
-    transition: background 0.2s;
+  transition: background 0.2s ease, transform 0.1s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.clienteCard:hover {
-    background-color: #f5f5f5;
+.clienteCardVazio::after,
+.clienteCard::after {
+  content: "";
+  position: absolute;
+  top: -30%;
+  right: -30%;
+  width: 180px;
+  height: 180px;
+  background: linear-gradient(90deg, var(--primary), transparent);
+  opacity: 0.12;
+  filter: blur(60px);
+  pointer-events: none;
 }
+
+.clienteCardVazio:hover,
+.clienteCard:hover {
+  background: rgba(50, 50, 50, 0.75);
+  transform: scale(1.01);
+}
+
 
 .cardLeft {
     text-align: left;
@@ -151,54 +163,39 @@
     background-color: #702632;
 }
 
-.clienteCardVazio {
-    width: 100%;
-    height: 55px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #fff;
-    cursor: pointer;
-  box-shadow: var(--shadow);
-    transition: background 0.2s;
-}
-
 .modalOverlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 9999;
 }
 
 .modal {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    width: 45%;
+   background-color: var(--card);
+    color: var(--foreground);
+    padding: 2rem;
+    border-radius: 0.8rem;
+    width: 50%;
     max-width: 900px;
+    box-shadow: var(--shadow);
+    animation: fadeIn 0.25s ease;
 }
 
 .modal h3 {
     text-align: center;
-    margin-bottom: 20px;
-    font-size: x-large;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--foreground);
 }
 
 .formCadastro {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
-    margin-left: 15px;
 }
 
 .campo {
@@ -208,65 +205,39 @@
 }
 
 .campo label {
-    font-weight: bold;
-    font-size: 13px;
+    font-weight: 500;
     margin-bottom: 4px;
+    color: var(--foreground);
+    font-size: 0.9rem;
 }
 
 .campo input {
-    padding: 8px;
-    border: 1px solid #ccc;
+    padding: 8px 10px;
+    border: 1px solid var(--input);
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 0.9rem;
+    background-color: var(--card-blur);
+    color: var(--foreground);
+    outline: none;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
-.nome input {
-    width: 400px;
-    background-color: #f9f9f9;
+.campo input:focus {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 2px rgba(255, 190, 11, 0.25);
 }
 
-.cpf input {
-    width: 200px;
-    text-align: center;
-}
-
-.email input {
-    width: 400px;
-}
-
-.celular input {
-    width: 200px;
-}
-
-.fixo input {
-    width: 180px;
-}
-
-.logradouro input {
-    width: 320px;
-}
-
-.numero input {
-    width: 80px;
-}
-
-.bairro input {
-    width: 200px;
-}
-
-.cidade input {
-    width: 200px;
-}
-
-.estado input {
-    width: 60px;
-    text-transform: uppercase;
-}
-
-.cep input {
-    width: 110px;
-    text-align: center;
-}
+.nome input { width: 100%; max-width: 400px; }
+.cpf input { width: 180px; text-align: center; }
+.email input { width: 100%; max-width: 400px; }
+.celular input { width: 180px; }
+.fixo input { width: 160px; }
+.logradouro input { width: 100%; max-width: 320px; }
+.numero input { width: 80px; }
+.bairro input { width: 180px; }
+.cidade input { width: 180px; }
+.estado input { width: 60px; text-transform: uppercase; }
+.cep input { width: 100px; text-align: center; }
 
 .modalActions {
     display: flex;
@@ -276,12 +247,30 @@
 }
 
 .modalActions button {
-    background: #912f40;
-    color: white;
-    padding: 8px 20px;
+   padding: 8px 20px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.modalActions button:first-child {
+    background-color: var(--destructive);
+    color: var(--destructive-foreground);
+}
+
+.modalActions button:first-child:hover {
+    background-color: #d73833;
+}
+
+.modalActions button:last-child {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+}
+
+.modalActions button:last-child:hover {
+    background-color: var(--accent);
 }
 
 .paginacao {
@@ -297,13 +286,14 @@
     padding: 5px 10px;
     border: none;
     border-radius: 6px;
-    background-color: #912f40;
-    color: white;
+    background-color: var(--primary);
+    color:  var(--primary-foreground);
     cursor: pointer;
 }
 
 .paginacao button:hover {
-    background-color: #702632;
+    background: rgba(255, 190, 11, 0.95) !important;
+    color: var(--sidebar-primary-foreground);
 }
 
 .ativo {
@@ -311,9 +301,18 @@
 }
 
 .erro {
-    color: #d93025;
+ color: var(--destructive);
     font-size: 12px;
     margin-top: 4px;
-    display: block;
-    transition: opacity 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

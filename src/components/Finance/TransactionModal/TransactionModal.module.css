@@ -1,24 +1,24 @@
 .overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
+    animation: fadeIn 0.3s ease;
 }
 
 .modal {
-    background: #fff;
-    border-radius: 12px;
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 0.8rem;
     padding: 2rem;
     width: 820px;
     max-width: 90%;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.3s ease;
+    box-shadow: var(--shadow);
+    color: var(--foreground);
+    animation: scaleIn 0.25s ease;
 }
 
 .header {
@@ -37,12 +37,27 @@
     gap: 0.5rem;
 }
 
+label {
+    font-weight: 500;
+    color: var(--foreground);
+}
+
 input,
 select {
     padding: 0.6rem 0.8rem;
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 0.8rem;
+   background-color: var(--card);
+    color: var(--foreground);
+    outline: none;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 2px rgba(255, 190, 11, 0.25);
 }
 
 /* Agrupa os radios e adiciona espaçamento */
@@ -59,6 +74,7 @@ select {
     align-items: center;
     gap: 0.3rem;
     /* distância entre o círculo e o texto */
+    color: var(--foreground);
 }
 
 /* Input e botão lado a lado */
@@ -69,46 +85,50 @@ select {
     margin-top: 0.5rem;
 }
 
+.buttonSearchClient {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border: none;
+    border-radius: 8px;
+    /* width: 10px; */
+    /* height: 32px; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.buttonSearchClient:hover {
+    background-color: var(--accent);
+}
+
 .buttonAddClient {
     margin-top: 0.4rem;
     padding: 8px 12px;
-    background-color: #000;
-    color: white;
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
     border: none;
     border-radius: 6px;
     cursor: pointer;
     transition: background 0.3s ease;
-
     width: 183px;
 }
 
 .buttonAddClient:hover {
-    background-color: #2a2a2aff;
+    background-color: var(--accent);
 }
+
 
 /* Informações do cliente com leve margem */
 .clientInfo {
     margin-top: 0.5rem;
-    background-color: #f9f9f9;
+    background-color: var(--muted);
     padding: 0.5rem;
     border-radius: 5px;
     font-size: 1rem;
-    color: #555;
-}
-
-.buttonSearchClient {
-    background-color: #000;
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    font-size: 14px;
+    color: var(--muted-foreground);
 }
 
 .buttons {
@@ -119,8 +139,8 @@ select {
 }
 
 .save {
-    background: #4caf50;
-    color: white;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
     padding: 0.6rem 1.2rem;
     border: none;
     border-radius: 8px;
@@ -130,12 +150,12 @@ select {
 }
 
 .save:hover {
-    background: #45a049;
+    background-color: var(--accent);
 }
 
 .cancel {
-    background: #f44336;
-    color: white;
+    background-color: var(--destructive);
+    color: var(--destructive-foreground);
     padding: 0.6rem 1.2rem;
     border: none;
     border-radius: 8px;
@@ -145,7 +165,7 @@ select {
 }
 
 .cancel:hover {
-    background: #d73833;
+    background-color: #d73833; 
 }
 
 @keyframes fadeIn {
@@ -153,7 +173,17 @@ select {
         opacity: 0;
         transform: scale(0.9);
     }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
 
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
     to {
         opacity: 1;
         transform: scale(1);

@@ -1,5 +1,5 @@
 .container {
-  padding: 2rem;
+  padding: 15px;
 }
 
 .header {
@@ -23,4 +23,18 @@
 
 .containerLastTransactions {
   margin-top: 1rem;
+}
+
+
+.buttonNav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    width: 100%;
+    justify-content: flex-end;
+}
+
+.buttonNav button{
+    width: 150px;
+
 }
