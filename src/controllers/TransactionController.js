@@ -125,7 +125,6 @@ async function resolveCategory(categoryRaw) {
 
     return { id: Number(created.id), created: true };
   } catch (err) {
-    // repassa erro para o chamador lidar
     throw err;
   }
 }
@@ -171,7 +170,8 @@ export async function createTransaction(req, res) {
 
     const numAmountRaw = Number(amount);
     if (!Number.isFinite(numAmountRaw)) return badRequest(res, "amount deve ser numérico.");
-    const numAmount = Number(numAmountRaw.toFixed(2));
+    // normaliza para 2 casas antes de inserir e garante POSITIVO
+    const numAmount = Number(Math.abs(numAmountRaw).toFixed(2));
 
     if (!isISODate(transaction_date)) return badRequest(res, "transaction_date deve ser YYYY-MM-DD.");
 
@@ -231,11 +231,9 @@ export async function getTransactions(req, res) {
       .order("id", { ascending: false });
 
     if (category_id_raw) {
-      // aceitar tanto id quanto nome no filtro
       if (Number.isFinite(Number(category_id_raw))) {
         query = query.eq("category_id", Number(category_id_raw));
       } else {
-        // tentar resolver nome -> id (silencioso: se não achar, não aplica filtro)
         try {
           const resolved = await resolveCategory(category_id_raw);
           if (resolved && resolved.id) query = query.eq("category_id", resolved.id);
@@ -325,7 +323,8 @@ export async function updateTransaction(req, res) {
     if (amount !== undefined) {
       const num = Number(amount);
       if (!Number.isFinite(num)) return badRequest(res, "amount deve ser numérico.");
-      updates.amount = Number(num.toFixed(2));
+      // garante positivo
+      updates.amount = Number(Math.abs(num).toFixed(2));
     }
     if (type !== undefined) {
       if (!isTypeAccepted(type)) return badRequest(res, "Tipo inválido. Use 'entrada'/'saida' ou 'credit'/'debit'.");
