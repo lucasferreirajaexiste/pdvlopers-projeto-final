@@ -3,15 +3,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f9fafb; /* bg-gray-50 */
+  background-color: var(--background);
   padding: 16px;
 }
 
 .card {
-  background-color: #fff;
+  background-color: var(--card);
   padding: 32px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
   width: 100%;
   max-width: 400px;
 }
@@ -25,7 +25,7 @@
   margin: 0 auto 16px;
   width: 48px;
   height: 48px;
-  background-color: #dbeafe;
+  background-color: var(--muted);
   border-radius: 9999px;
   display: flex;
   align-items: center;
@@ -35,18 +35,19 @@
 .icon {
   width: 24px;
   height: 24px;
-  color: #2563eb; /* text-blue-600 */
+  color: var(--primary);
 }
 
 .title {
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 5px;
+  color: var(--foreground);
 }
 
 .subtitle {
   font-size: 0.923rem;
-  color: #6b7280;
+  color: var(--muted-foreground);
 }
 
 .form {
@@ -57,21 +58,25 @@
 
 .label {
   font-size: 14px;
+  color: var(--foreground);
 }
 
 .form Input {
   padding: 6px 12px;
-  border: 1px solid #6b7280;
+  border: 1px solid var(--muted-foreground);
   border-radius: 8px;
+  color: var(--foreground);
+  background-color: var(--input);
 }
 
 Input::placeholder {
   font-size: 15px;
+  color: var(--muted-foreground);
 }
 
 .button {
-  background-color: #000000; 
-  color: white;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
   padding: 10px;
   border: none;
   border-radius: 8px;
@@ -84,19 +89,19 @@ Input::placeholder {
 }
 
 .button:hover:not(:disabled) {
-  background-color: #3a3a3a; 
+  background-color: var(--muted);
 }
 
 .link {
   text-align: center;
   font-size: 0.875rem;
-  color: #2563eb;
+  color: var(--primary);
   text-decoration: none;
 }
 
 .error {
-  background-color: #fee2e2;
-  color: #b91c1c;
+  background-color: var(--destructive);
+  color: var(--destructive-foreground);
   padding: 8px;
   border-radius: 4px;
   font-size: 0.875rem;
@@ -106,7 +111,7 @@ Input::placeholder {
   width: 16px;
   height: 16px;
   border: 2px solid transparent;
-  border-top-color: white;
+  border-top-color: var(--primary-foreground);
   border-radius: 50%;
   display: inline-block;
   animation: spin 0.6s linear infinite;
