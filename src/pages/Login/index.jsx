@@ -6,8 +6,9 @@ import { ShoppingCart } from "lucide-react";
 import styles from "./Login.module.css";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
-import { useAuth } from "../../contexts/AuthContext"; 
+import { useAuth } from "../../contexts/AuthContext";
 import { useToast } from "../../hooks/use-toast";
+import balcaoIcon from "../../assets/balcao-icon.png";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -45,9 +46,9 @@ export default function Login() {
       <div className={styles.card}>
         <div className={styles.header}>
           <div className={styles.iconWrapper}>
-            <ShoppingCart className={styles.icon} />
+            <img src={balcaoIcon} className={styles.icon} />
           </div>
-          <h2 className={styles.title}>Sistema PDV</h2>
+          <h2 className={styles.title}>Balcão</h2>
           <p className={styles.subtitle}>Faça login para acessar o sistema</p>
         </div>
 
