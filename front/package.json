@@ -5,9 +5,7 @@
   "main": "src/server.js",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "nodemon src/server.js",
-    "dev:frontend": "vite",
+    "dev": "vite",
     "start": "node src/server.js",
     "start:backend": "node src/server.js",
     "build": "vite build",
