@@ -43,6 +43,13 @@
   box-shadow: 0 0 0 3px var(--accent);
 }
 
+.input:disabled,
+.select:disabled,
+.textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 span {
   color: red;
 }
@@ -69,6 +76,12 @@ span {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.25rem;
+}
+
+.helperText {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  margin-top: 0.35rem;
 }
 
 @media (min-width: 768px) {
@@ -129,4 +142,18 @@ span {
 
 .submitButton:hover {
   filter: brightness(0.95);
+}
+
+.cancelButton:disabled,
+.submitButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.checkbox:disabled {
+  cursor: not-allowed;
+}
+
+.checkbox:disabled + span {
+  opacity: 0.6;
 }

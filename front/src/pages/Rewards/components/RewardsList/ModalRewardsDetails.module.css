@@ -180,6 +180,14 @@
   margin-bottom: 1.5rem;
 }
 
+.additionalInfo {
+  color: var(--muted-foreground);
+  display: grid;
+  font-size: 0.85rem;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+
 .actions {
   display: flex;
   gap: 1rem;

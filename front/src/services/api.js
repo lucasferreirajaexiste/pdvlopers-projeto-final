@@ -92,8 +92,41 @@ export const deleteTransaction = (id) =>
 export const getLoyaltyHistory = (id) =>
   apiRequest("GET", `/loyalty/history/${id}`);
 
+export const getClientPoints = (id) =>
+  apiRequest("GET", `/loyalty/points/${id}`);
+
+export const getRewards = () =>
+  apiRequest("GET", "/loyalty/rewards");
+
+export const getRewardById = (id) =>
+  apiRequest("GET", `/loyalty/rewards/${id}`);
+
+export const createReward = (payload) =>
+  apiRequest("POST", "/loyalty/rewards", payload);
+
+export const updateReward = (id, payload) =>
+  apiRequest("PUT", `/loyalty/rewards/${id}`, payload);
+
+export const deleteReward = (id) =>
+  apiRequest("DELETE", `/loyalty/rewards/${id}`);
+
+export const redeemReward = (payload) =>
+  apiRequest("POST", "/loyalty/points/redeem", payload);
+
 // Promotions
 export const getPromotions = () => apiRequest("GET", "/promotions");
+
+export const getPromotionById = (id) =>
+  apiRequest("GET", `/promotions/${id}`);
+
+export const createPromotion = (payload) =>
+  apiRequest("POST", "/promotions", payload);
+
+export const updatePromotion = (id, payload) =>
+  apiRequest("PUT", `/promotions/${id}`, payload);
+
+export const deletePromotion = (id) =>
+  apiRequest("DELETE", `/promotions/${id}`);
 
 // Categories 
 export const getCategories = () => apiRequest("GET", "/financial/categories");

@@ -1,86 +1,62 @@
-﻿import { useState, useEffect } from "react";
-import styles from "./RewardsList.module.css";
+import { useEffect, useState } from "react";
 import { Gift } from "lucide-react";
+import {
+  createReward,
+  getRewards,
+  updateReward,
+} from "../../../../services/api";
+import styles from "./RewardsList.module.css";
 import { ModalRewardsList } from "./ModalRewardsList";
 import { ModalRewardsDetails } from "./ModalRewardsDetails";
 import { RewardForm } from "../RewardForm/RewardForm";
+
+const normalizeReward = (reward) => ({
+  id: reward.id,
+  name: reward.name,
+  description: reward.description,
+  pointsRequired: Number(reward.points_required ?? reward.points ?? 0),
+  active: reward.active !== false,
+  validUntil:
+    reward.valid_until || reward.validity_date || reward.expires_at || null,
+  category: reward.category || null,
+  createdAt: reward.created_at || null,
+  updatedAt: reward.updated_at || null,
+});
 
 export const RewardsList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedReward, setSelectedReward] = useState(null);
-  const [rewardsList, setRewardsList] = useState([
-    {
-      id: 1,
-      name: "Desconto 10%",
-      points: 100,
-      available: true,
-      validityDate: null,
-    },
-    {
-      id: 2,
-      name: "Produto Grátis",
-      points: 250,
-      available: true,
-      validityDate: null,
-    },
-    {
-      id: 3,
-      name: "Desconto 20%",
-      points: 500,
-      available: false,
-      validityDate: null,
-    },
-    {
-      id: 4,
-      name: "Brinde Especial",
-      points: 1000,
-      available: false,
-      validityDate: null,
-    },
-  ]);
+  const [rewardsList, setRewardsList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  // Função para verificar e atualizar a disponibilidade das recompensas
-  const checkRewardsValidity = () => {
-    const now = new Date();
-
-    setRewardsList((prevRewards) => {
-      return prevRewards
-        .map((reward) => {
-          if (!reward.validityDate) return reward;
-
-          // A data vale até 23:59 do mesmo dia
-          const validityDate = new Date(reward.validityDate);
-          validityDate.setHours(23, 59, 59, 999);
-
-          const isExpired = validityDate < now;
-
-          return {
-            ...reward,
-            available: !isExpired,
-          };
-        })
-        .filter((reward) => {
-          // Remove recompensas expiradas há mais de 30 dias
-          if (reward.validityDate) {
-            const validityDate = new Date(reward.validityDate);
-            validityDate.setHours(23, 59, 59, 999);
-            validityDate.setDate(validityDate.getDate() + 30);
-            return validityDate >= now;
-          }
-          return true;
-        });
-    });
-  };
-
-  // Verifica a validade a cada minuto e ao carregar o componente
   useEffect(() => {
-    checkRewardsValidity();
-    const interval = setInterval(checkRewardsValidity, 60000);
-    return () => clearInterval(interval);
+    loadRewards();
   }, []);
 
+  const loadRewards = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await getRewards();
+      const data = Array.isArray(response)
+        ? response
+        : response?.items || [];
+      setRewardsList(data.map(normalizeReward));
+    } catch (err) {
+      console.error("Erro ao carregar recompensas:", err);
+      setError("Não foi possível carregar as recompensas.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleOpenModal = () => {
+    if (saving) return;
+    setError("");
     setIsModalOpen(true);
   };
 
@@ -88,107 +64,192 @@ export const RewardsList = () => {
     setIsModalOpen(false);
   };
 
-  // Função para abrir os detalhes de uma recompensa
   const handleViewDetails = (reward) => {
     setSelectedReward(reward);
     setIsDetailsModalOpen(true);
   };
 
-  // Função para fechar os detalhes
   const handleCloseDetails = () => {
     setIsDetailsModalOpen(false);
     setSelectedReward(null);
   };
 
-  // Função para adicionar uma nova recompensa
-  const handleAddReward = (newRewardData) => {
-    const newReward = {
-      id: Date.now(),
-      name: newRewardData.name,
-      points: parseInt(newRewardData.points),
-      available: true, // Inicia como disponível
-      validityDate: newRewardData.validityDate,
-      category: newRewardData.category,
-      description: newRewardData.description,
-    };
+  const handleToggleStatus = async (reward) => {
+    setSaving(true);
+    try {
+      const updated = await updateReward(reward.id, {
+        active: !reward.active,
+      });
 
-    setRewardsList((prevRewards) => [...prevRewards, newReward]);
-    handleCloseModal();
+      setRewardsList((prev) =>
+        prev.map((item) =>
+          item.id === reward.id ? normalizeReward(updated) : item
+        )
+      );
+      if (selectedReward?.id === reward.id) {
+        setSelectedReward(normalizeReward(updated));
+      }
+    } catch (err) {
+      console.error("Erro ao atualizar status da recompensa:", err);
+      setError("Não foi possível atualizar a recompensa.");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  return (
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h3 className={styles.title}>Recompensas Disponíveis</h3>
+  const handleAddReward = async (formData) => {
+    setSaving(true);
+    setError("");
+    try {
+      const created = await createReward({
+        name: formData.name,
+        description: formData.description,
+        points_required: Number(formData.pointsRequired),
+      });
 
-          <div className={styles.newRewardButton} onClick={handleOpenModal}>
-            <Gift className={styles.icon} />
-            <button className={styles.button}>Nova Recompensa</button>
-          </div>
+      let normalized = normalizeReward(created);
+
+      if (!formData.active && normalized.active) {
+        const updated = await updateReward(normalized.id, { active: false });
+        normalized = normalizeReward(updated);
+      }
+
+      setRewardsList((prev) => [normalized, ...prev]);
+      handleCloseModal();
+    } catch (err) {
+      console.error("Erro ao criar recompensa:", err);
+      const message =
+        err?.error || err?.message || "Não foi possível criar a recompensa.";
+      setError(message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className={styles.feedback}>
+          <p>Carregando recompensas...</p>
         </div>
+      );
+    }
 
-        <div className={styles.grid}>
-          {rewardsList.map((reward) => (
+    if (error && !rewardsList.length) {
+      return (
+        <div className={styles.feedback}>
+          <p>{error}</p>
+        </div>
+      );
+    }
+
+    if (!rewardsList.length) {
+      return (
+        <div className={styles.feedback}>
+          <p>Ainda não há recompensas cadastradas.</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className={styles.grid}>
+        {rewardsList.map((reward) => {
+          const isActive = reward.active;
+
+          return (
             <div
               key={reward.id}
               className={`${styles.card} ${
-                !reward.available ? styles.cardDisabled : ""
+                !isActive ? styles.cardDisabled : ""
               }`}
             >
               <div className={styles.cardHeader}>
                 <h3 className={styles.cardTitle}>{reward.name}</h3>
                 <p
                   className={
-                    reward.available
+                    isActive
                       ? styles.cardStatusActive
                       : styles.cardStatusInactive
                   }
                 >
-                  {reward.available ? "Disponível" : "Indisponível"}
+                  {isActive ? "Disponível" : "Indisponível"}
                 </p>
               </div>
 
-              <p className={styles.cardPoints}>{reward.points}</p>
+              <p className={styles.cardPoints}>{reward.pointsRequired}</p>
               <p className={styles.cardDescription}>pontos necessários</p>
 
-              {reward.validityDate && (
+              {reward.validUntil && (
                 <p className={styles.validityDate}>
                   Válido até:{" "}
-                  {new Date(reward.validityDate).toLocaleDateString("pt-BR")}
+                  {new Date(reward.validUntil).toLocaleDateString("pt-BR")}
                 </p>
               )}
 
-              <button
-                className={
-                  reward.available
-                    ? styles.cardButtonActive
-                    : styles.cardButtonDisabled
-                }
-                disabled={!reward.available}
-                onClick={() => reward.available && handleViewDetails(reward)}
-              >
-                {reward.available ? "Ver Detalhes" : "Indisponível"}
-              </button>
+              <div className={styles.actions}>
+                <button
+                  className={
+                    isActive
+                      ? styles.cardButtonActive
+                      : styles.cardButtonDisabled
+                  }
+                  onClick={() => handleViewDetails(reward)}
+                >
+                  Ver detalhes
+                </button>
+                <button
+                  className={styles.secondaryButton}
+                  disabled={saving}
+                  onClick={() => handleToggleStatus(reward)}
+                >
+                  {isActive ? "Pausar" : "Reativar"}
+                </button>
+              </div>
             </div>
-          ))}
-        </div>
-
-        <ModalRewardsList
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          title="Nova Recompensa"
-        >
-          <RewardForm
-            onClose={handleCloseModal}
-            onAddReward={handleAddReward}
-          />
-        </ModalRewardsList>
-
-        <ModalRewardsDetails
-          isOpen={isDetailsModalOpen}
-          onClose={handleCloseDetails}
-          reward={selectedReward}
-        />
+          );
+        })}
       </div>
+    );
+  };
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h3 className={styles.title}>Recompensas Disponíveis</h3>
+
+        <div className={styles.newRewardButton} onClick={handleOpenModal}>
+          <Gift className={styles.icon} />
+          <button className={styles.button} disabled={saving}>
+            Nova Recompensa
+          </button>
+        </div>
+      </div>
+
+      {error && rewardsList.length > 0 && (
+        <div className={styles.inlineError}>{error}</div>
+      )}
+
+      {renderContent()}
+
+      <ModalRewardsList
+      isOpen={isModalOpen}
+      onClose={handleCloseModal}
+      title="Nova Recompensa"
+    >
+        <RewardForm
+          onClose={handleCloseModal}
+          onSubmit={handleAddReward}
+          disabled={saving}
+        />
+      </ModalRewardsList>
+
+      <ModalRewardsDetails
+        isOpen={isDetailsModalOpen}
+        onClose={handleCloseDetails}
+        reward={selectedReward}
+        onToggleStatus={handleToggleStatus}
+        isProcessing={saving}
+      />
+    </div>
   );
 };

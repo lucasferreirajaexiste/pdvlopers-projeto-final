@@ -188,3 +188,20 @@
 .vip {
   background-color: var(--vip);
 }
+
+.feedback {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--muted-foreground);
+  margin-bottom: 1.5rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.emptyState {
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
+  text-align: center;
+  width: 100%;
+}
