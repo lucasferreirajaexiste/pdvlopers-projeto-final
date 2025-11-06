@@ -1,0 +1,166 @@
+﻿:root { /* removed local border; using global variables */ }
+
+*{
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.container {
+  background-color: var(--card);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.header{
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.headerTitle {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.iconTitle {
+  color: var(--chart-3);
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.filters {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filterLabel {
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+}
+
+.select {
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--card-foreground);
+  padding: 0.55rem 0.75rem;
+}
+
+.select:disabled {
+  opacity: 0.6;
+}
+
+.title {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+}
+
+.subtitle {
+  color: var(--muted-foreground);
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.item {
+  border-bottom-width: 1px;
+  padding-bottom: 0.5rem;
+}
+
+.itemContent {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 15px;
+
+}
+
+.itemIcon{
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.backgroundIcon{
+  background-color: var(--card-blur);
+  padding: 12px;
+  border-radius: 100px;
+  display: inline-flex;
+  align-items: center;
+}
+.icon{
+  color: var(--chart-2);
+  height: 1.1rem;
+  width: 1.1rem;
+
+}
+
+.client {
+  font-weight: 700;
+}
+
+.reward {
+  color: var(--muted-foreground);
+  font-size: 15px;
+}
+
+.rightContent {
+  text-align: right;
+}
+
+.points {
+  font-weight: 600;
+}
+
+.date {
+  color: var(--muted-foreground);
+}
+
+.pointsRedeem {
+  color: var(--destructive);
+}
+
+.pointsEarn {
+  color: var(--chart-2);
+}
+
+.feedback {
+  align-items: center;
+  background-color: var(--card);
+  border: 1px dashed var(--border);
+  border-radius: 0.75rem;
+  color: var(--muted-foreground);
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  min-height: 120px;
+  padding: 1rem;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .itemContent {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .rightContent {
+    text-align: left;
+  }
+}

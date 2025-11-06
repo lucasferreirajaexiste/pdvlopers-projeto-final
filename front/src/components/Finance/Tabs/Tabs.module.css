@@ -1,0 +1,55 @@
+.tabsContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(42, 42, 42, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  width: fit-content;
+  box-shadow: var(--shadow);
+
+}
+
+.tab {
+  padding: 0.5rem 1rem;
+  border: none;
+  cursor: pointer;
+  border-radius: 0.5rem;
+
+  background: transparent;
+  color: var(--foreground);
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  transition: all 0.25s ease;
+}
+
+.tab:hover {
+ background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-1px);
+}
+
+.tab.ativa {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 1px var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.containerLastTransactions {
+  margin-top: 1rem;
+}
+
+.transactionItem {
+  margin-top: 1.2rem;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,40 @@
+.container {
+  padding: 15px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.cards {
+  margin-top: 2rem;
+  display: grid;
+  gap: 1.8rem;
+  flex-wrap: wrap;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.tabs {
+  margin-top: 2rem;
+}
+
+.containerLastTransactions {
+  margin-top: 1rem;
+}
+
+
+.buttonNav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    width: 100%;
+    justify-content: flex-end;
+}
+
+.buttonNav button{
+    width: 150px;
+
+}

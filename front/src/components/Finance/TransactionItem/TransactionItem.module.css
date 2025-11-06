@@ -1,0 +1,71 @@
+.item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 0.8rem;
+}
+
+.iconWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.incomeBg {
+    background-color: #dcfce7;
+}
+
+.expenseBg {
+    background-color: #fee2e2;
+}
+
+.iconIncome {
+    color: #16a34a;
+}
+
+.iconExpense {
+    color: #dc2626;
+}
+
+.details {
+    flex: 1;
+    margin-left: 12px;
+}
+
+.title {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: black;
+    font-weight: 600;
+}
+
+.meta {
+    font-size: 12px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.category {
+    border: 1px solid #eee;
+    padding: 4px;
+    border-radius: 6px;
+    color: #333;
+}
+
+.amountIncome {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.amountExpense {
+    color: #dc2626;
+    font-weight: 600;
+}
