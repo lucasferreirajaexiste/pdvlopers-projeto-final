@@ -1,13 +1,21 @@
 import axios from "axios";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const API_KEY = import.meta.env.VITE_API_KEY;
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
+  baseURL: API_BASE_URL,
+  headers: API_KEY ? { "x-api-key": API_KEY } : undefined,
 });
 
 // request interceptor: adiciona auth e log
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (API_KEY && !config.headers["x-api-key"]) {
+    config.headers["x-api-key"] = API_KEY;
+  }
   console.log(
     "[API] request:",
     (config.method || "GET").toUpperCase(),

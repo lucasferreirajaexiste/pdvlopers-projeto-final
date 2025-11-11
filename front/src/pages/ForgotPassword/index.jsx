@@ -18,18 +18,23 @@ export default function ForgotPassword() {
     setIsLoading(true);
     try {
       const { data } = await api.post("/auth/forgot-password", { email });
+      const message =
+        data?.message ||
+        data?.data?.message ||
+        "Verifique seu email para redefinir sua senha.";
       setSuccess(true);
       toast({
         title: "Email enviado!",
-        description:
-          data.message || "Verifique seu email para redefinir sua senha.",
+        description: message,
         variant: "default",
       });
     } catch (error) {
       toast({
         title: "Erro ao enviar email",
         description:
-          error.response?.data?.message || "Tente novamente mais tarde.",
+          error.response?.data?.message ||
+          error.response?.data?.data?.message ||
+          "Tente novamente mais tarde.",
         variant: "destructive",
       });
     } finally {

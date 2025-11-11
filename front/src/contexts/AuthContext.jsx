@@ -9,9 +9,23 @@ export function AuthProvider({ children }) {
   async function login(email, senha) {
     try {
       const { data } = await api.post("/auth/login", { email, password: senha });
-      localStorage.setItem("token", data.accessToken);
-      setUser(data.user); // <-- define o usuário após login
-      return true;
+      const payload = data?.data || data || {};
+      const accessToken =
+        payload.accessToken ||
+        payload.access_token ||
+        data?.accessToken ||
+        data?.access_token;
+      const refreshToken =
+        payload.refreshToken ||
+        payload.refresh_token ||
+        data?.refreshToken ||
+        data?.refresh_token;
+      const detectedUser = payload.user || data?.user || null;
+
+      if (accessToken) localStorage.setItem("token", accessToken);
+      if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+      if (detectedUser) setUser(detectedUser);
+      return !!accessToken;
     } catch {
       return false;
     }
@@ -19,6 +33,7 @@ export function AuthProvider({ children }) {
 
   function logout() {
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
     setUser(null);
   }
 
