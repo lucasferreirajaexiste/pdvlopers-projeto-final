@@ -22,6 +22,7 @@ export default function AppRoutes() {
     <Router>
       <Routes>
         {/* Rotas públicas */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
        
@@ -48,7 +49,7 @@ export default function AppRoutes() {
         </Route>
 
         {/* Rota padrão */}
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );
