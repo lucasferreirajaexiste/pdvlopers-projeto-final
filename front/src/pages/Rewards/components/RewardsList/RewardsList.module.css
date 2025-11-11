@@ -1,0 +1,225 @@
+﻿/* use global theme variables from src/styles/global.css */
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 25px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 640px) {
+  .header {
+    flex-direction: row; 
+    align-items: center;
+  }
+}
+
+.title {
+  white-space: noWrap;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.newRewardButton {
+  display: flex;
+  align-items: center;
+  gap: 0.8125rem;
+  padding: 8px 16px;
+  background-color: var(--sidebar-primary);
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: noWrap;
+}
+
+.button {
+  background:none;
+  color: var(--sidebar-primary-foreground);
+  border: none;
+  font-weight: 500;
+}
+
+.newRewardButton:hover {
+  background-color: var(--accent);
+}
+
+.icon {
+  color: var(--sidebar-primary-foreground);
+  width: 18px;
+  height: 18px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+@media (min-width: 480px) {
+  .grid {
+    grid-template-columns: repeat(1, 1fr); 
+  }
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Layout original em desktop */
+    gap: 20px;
+  }
+}
+
+.card {
+  border-radius: 0.9375rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 20px 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--card);
+  color: var(--card-foreground);
+  overflow: hidden;
+}
+
+.cardDisabled {
+  opacity: 0.6;
+}
+
+.cardHeader {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cardTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.cardStatusActive {
+  background-color: var(--sidebar-primary);
+  color: var(--sidebar-primary-foreground);
+  font-size: 14px;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.cardStatusInactive {
+  color: var(--muted-foreground);
+  font-weight: 500;
+  background-color: transparent;
+  font-size: 14px;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.cardPoints {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--chart-4);
+  margin-top: 9px;
+  line-height: normal;
+}
+
+.cardDescription {
+  margin-top: 0;
+  color: var(--muted-foreground);
+  margin-bottom: 0.5rem;
+}
+
+.cardButtonActive {
+  background-color: var(--sidebar-primary);
+  color: var(--sidebar-primary-foreground);
+  cursor: pointer;
+  border: none;
+}
+
+.cardButtonActive , .cardButtonDisabled{
+  width: 100%;
+  padding: 0.65rem;
+  font-weight: 500;
+  border-radius: 9px;
+  font-size: 0.9rem;
+}
+.cardButtonActive:hover {
+  background-color: rgba(255, 190, 11, 0.95);
+}
+
+.cardButtonDisabled {
+  background-color:  var(--card);
+  color: var(--muted-foreground);
+  cursor: not-allowed;
+  box-shadow: 0px 0.5px 4px rgba(0, 0, 0, 0.1);
+}
+.validityDate {
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: auto;
+  width: 100%;
+}
+
+.secondaryButton {
+  flex: 1;
+  padding: 0.65rem;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background-color: transparent;
+  color: var(--card-foreground);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.secondaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.secondaryButton:not(:disabled):hover {
+  background-color: var(--card-blur);
+}
+
+.feedback {
+  align-items: center;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  color: var(--muted-foreground);
+  display: flex;
+  justify-content: center;
+  min-height: 160px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.inlineError {
+  background-color: rgba(255, 0, 0, 0.05);
+  border: 1px solid rgba(255, 0, 0, 0.25);
+  border-radius: 0.75rem;
+  color: #ff6161;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+}

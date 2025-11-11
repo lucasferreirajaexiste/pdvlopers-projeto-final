@@ -1,0 +1,135 @@
+.sidebar {
+	width: 16rem;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	background-color: var(--sidebar);
+	border-right: 1px solid var(--muted-foreground);
+	position: fixed; 
+	top: 0;
+	left: 0;
+	z-index: 1000; 
+}
+
+.header {
+	border-bottom: 1px solid var(--muted-foreground);
+	padding: 1rem;
+}
+
+.headerContent {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.logo {
+	width: 2rem;
+	height: 2rem;
+	background-color: #d1d5db;
+	border-radius: 0.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.logoIcon {
+	width: 1rem;
+	height: 1rem;
+	color: #111827;
+}
+
+.title {
+	font-weight: 600;
+	color: var(--sidebar-foreground);
+}
+
+.subtitle {
+	font-size: 0.875rem;
+	color: var(--sidebar-foreground);
+}
+
+.menuGroup {
+	padding: 1rem 0.5rem;
+}
+
+.menuGroupLabel {
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: var(--sidebar-foreground);
+	text-transform: uppercase;
+	margin-bottom: 0.5rem;
+}
+
+.menuItem {
+	display: flex;
+}
+
+.menuLink {
+	margin: 4px 0;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	padding: 0.5rem;
+	border-radius: 0.375rem;
+	color: var(--sidebar-foreground);
+	text-decoration: none;
+	background: transparent;
+	font-weight: bold;
+}
+
+.menuLink:hover {
+	color: var(--sidebar-foreground);
+	background-color: var(--sidebar-accent) !important;
+}
+
+.menuLinkActive {
+	background: var(--sidebar-primary);
+	color: var(--sidebar-primary-foreground);
+	font-weight: 500;
+}
+
+.menuLinkActive:hover {
+	background: rgba(255, 190, 11, 0.95) !important;
+	color: var(--sidebar-primary-foreground);
+}
+
+.footer {
+	margin-top: auto;
+	border-top: 1px solid var(--muted-foreground);
+	padding: 1rem;
+}
+
+.userInfo {
+	font-size: 0.875rem;
+	margin-bottom: 0.5rem;
+	color: var(--sidebar-foreground);
+}
+
+.userInfo p{
+	color: var(--sidebar-foreground);
+}
+
+.logoutButton {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	width: 100%;
+	padding: 0.5rem;
+	border-radius: 0.375rem;
+	cursor: pointer;
+	font-size: 0.875rem;
+	background: var(--sidebar-primary);
+	color: var(--sidebar-primary-foreground);
+}
+
+.logoutButton:hover {
+	background: rgba(255, 190, 11, 0.95) !important;
+	color: var(--sidebar-primary-foreground);
+}
+
+.icon {
+	width: 1rem;
+	height: 1rem;
+	color: var(--sidebar-primary-foreground);
+}

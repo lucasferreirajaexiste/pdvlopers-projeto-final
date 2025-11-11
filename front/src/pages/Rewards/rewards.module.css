@@ -1,0 +1,14 @@
+.rewards{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rewards-container {
+  font-family: inherit;
+}
+
+.rewards-link.active {
+  font-weight: 600;
+  color: var(--chart-4);
+}

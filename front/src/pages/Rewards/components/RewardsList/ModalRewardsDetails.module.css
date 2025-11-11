@@ -1,0 +1,244 @@
+﻿/* rely on global theme variables from src/styles/global.css */
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: modalAppear 0.2s ease-out;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--card-foreground);
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  color: var(--muted-foreground);
+  transition: all 0.2s;
+}
+
+.closeButton:hover {
+  background-color: var(--card-blur);
+  color: var(--card-foreground);
+}
+
+.content {
+  padding: 1.5rem;
+}
+
+.rewardImage {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.imagePlaceholder {
+  color: var(--muted-foreground);
+  background-color: var(--card-blur);
+  padding: 4rem;
+  border-radius: 12px;
+}
+
+.rewardInfo {
+  text-align: center;
+}
+
+.rewardName {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--card-foreground);
+  margin-bottom: 1rem;
+}
+
+.badgeContainer {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.statusAvailable {
+  background-color: var(--sidebar-primary);
+  color: var(--sidebar-primary-foreground);
+  cursor: pointer;
+  border: none;
+}
+
+.statusAvailable , .statusUnavailable{
+  width: 25%;
+  padding: 3px;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.statusUnavailable {
+  background-color: var(--card);
+  color: var(--muted-foreground);
+  cursor: not-allowed;
+  box-shadow: 0px 0.5px 4px rgba(0, 0, 0, 0.1);
+}
+
+.categoryBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: var(--card-blur);
+  color: var(--card-foreground);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.pointsSection {
+  background-color: var(--card-blur);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.pointsLabel {
+  display: block;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.pointsValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--chart-4);
+}
+
+.descriptionSection {
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.descriptionSection h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--card-foreground);
+  margin-bottom: 0.5rem;
+}
+
+.descriptionSection p {
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+.validitySection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--muted-foreground);
+  margin-bottom: 1.5rem;
+}
+
+.additionalInfo {
+  color: var(--muted-foreground);
+  display: grid;
+  font-size: 0.85rem;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.cancelButton {
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: filter 0.12s;
+}
+
+.cancelButton:hover {
+  filter: brightness(0.95);
+}
+
+.redeemButton {
+  background-color: var(--chart-4);
+  color: var(--popover-foreground);
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: filter 0.12s;
+}
+
+.redeemButton:hover {
+  filter: brightness(0.95);
+}
+
+@media (max-width: 640px) {
+  .modal {
+    margin: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+  
+  .header {
+    padding: 1rem;
+  }
+  
+  .content {
+    padding: 1rem;
+  }
+  
+  .actions {
+    flex-direction: column;
+  }
+}

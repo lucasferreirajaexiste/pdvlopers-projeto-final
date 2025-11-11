@@ -1,0 +1,25 @@
+.button {
+    padding: 8px 20px;
+    background-color: #000;
+    color: #f8f8f8;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s ease;
+    font-size: 12px;
+}
+
+.button:hover {
+    background-color: #2a2a2aff;
+}
+
+.icon {
+    margin-right: 8px;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+}

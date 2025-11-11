@@ -1,0 +1,40 @@
+.chartContainer {
+    display: flex;
+    gap: 20px;
+    flex-direction: column-reverse;
+    margin-top: 20px;
+}
+
+/* Área do gráfico */
+.graphic {
+    flex: 1;
+}
+
+/* Botões em coluna */
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+
+/* Estilo dos botões */
+.button {
+    padding: 8px 20px;
+    background-color: #000;
+    color: #f8f8f8;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+    min-width: 100px;
+}
+
+.button:hover {
+    background-color: #2a2a2a;
+}

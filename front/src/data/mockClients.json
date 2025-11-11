@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1,
+        "nome": "João Silva",
+        "cpf": "123.456.789-00",
+        "email": "joao.silva@email.com",
+        "telefone": "(11) 98765-4321",
+        "dataNascimento": "1990-09-15"
+    },
+    {
+        "id": 2,
+        "nome": "Maria Oliveira",
+        "cpf": "987.654.321-00",
+        "email": "maria.oliveira@email.com",
+        "telefone": "(21) 91234-5678",
+        "dataNascimento": "1990-08-15"
+    },
+    {
+        "id": 3,
+        "nome": "Carlos Souza",
+        "cpf": "111.222.333-44",
+        "email": "carlos.souza@email.com",
+        "telefone": "(31) 99876-5432",
+        "dataNascimento": "1990-09-15"
+    },
+    {
+        "id": 4,
+        "nome": "Ana Costa",
+        "cpf": "555.666.777-88",
+        "email": "ana.costa@email.com",
+        "telefone": "(41) 91234-5678",
+        "dataNascimento": "1990-09-15"
+    },
+    {
+        "id": 5,
+        "nome": "Pedro Lima",
+        "cpf": "999.888.777-66",
+        "email": "pedro.lima@email.com",
+        "telefone": "(51) 98765-4321",
+        "dataNascimento": "1990-02-15"
+    }
+]

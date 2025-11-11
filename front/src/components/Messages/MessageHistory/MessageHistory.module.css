@@ -1,0 +1,69 @@
+.item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 0.8rem;
+}
+
+.iconWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+}
+
+.emailBg {
+    background-color: #d0e8ff;
+}
+
+.iconEmail {
+    color: #004080;
+}
+
+.whatsappBg {
+    background-color: #d0f5d0;
+}
+
+.iconWhatsapp {
+    color: #006400;
+}
+
+.details {
+    flex: 1;
+    margin-left: 12px;
+}
+
+.title {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: black;
+}
+
+.meta {
+    font-size: 12px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.category {
+    border: 1px solid #eee;
+    padding: 4px 6px;
+    border-radius: 6px;
+    color: #333;
+}
+
+.numberRecipients {
+    color: #555;
+    font-weight: 500;
+}
+
+.date {
+    color: #888;
+}
