@@ -61,6 +61,8 @@ API REST para o sistema de gestão de fidelidade, promoções e operações de p
    # Edite o arquivo .env conforme necessário
    ```
 
+   Consulte [ENVIRONMENT.md](../ENVIRONMENT.md) para ver todos os campos usados no deploy (incluindo exemplos para o Vercel).
+
 4. **Execute as migrações do banco**
 
    ```bash

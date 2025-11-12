@@ -62,7 +62,7 @@ Para detalhes de instalação e scripts de cada subprojeto, consulte os respecti
 
 ## Configuração de ambiente
 
-Copie `.env.example` para `.env` em `back/` e `front/` e ajuste as variáveis conforme necessário.
+Copie `.env.example` para `.env` em `back/` e `front/` e ajuste as variáveis conforme necessário. Para ver a lista completa das envs usadas no deploy (incluindo exemplos reais para o Vercel), consulte [`ENVIRONMENT.md`](./ENVIRONMENT.md).
 
 ## Atualizar subprojetos com git subtree
 
