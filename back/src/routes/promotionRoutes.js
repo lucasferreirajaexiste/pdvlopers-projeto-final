@@ -13,9 +13,11 @@ const isISODate = (v) => !v || !isNaN(Date.parse(v));
 
 const ok = (res, data) => res.json(data);
 const created = (res, data) => res.status(201).json(data);
-const notFound = (res, msg = "Promoção não encontrada") => res.status(404).json({ error: msg });
+const notFound = (res, msg = "Promoção não encontrada") =>
+  res.status(404).json({ error: msg });
 const badReq = (res, msg) => res.status(400).json({ error: msg });
-const fail = (res, err) => res.status(500).json({ error: err?.message || "Erro interno" });
+const fail = (res, err) =>
+  res.status(500).json({ error: err?.message || "Erro interno" });
 
 // ---------- Segmentos ----------
 const escapeHtml = (s = "") =>
@@ -34,7 +36,7 @@ const SEGMENTS = [
   { key: "SILVER", label: "Clientes Silver" },
   { key: "INACTIVE", label: "Clientes inativos" },
 ];
-const SEGMENT_KEYS = new Set(SEGMENTS.map(s => s.key));
+const SEGMENT_KEYS = new Set(SEGMENTS.map((s) => s.key));
 
 const TIER_LIMITS = {
   VIP_MIN: Number.parseInt(process.env.LOYALTY_VIP_MIN || "1000", 10),
@@ -54,7 +56,7 @@ async function fetchClientesByIds(ids) {
     .from("clientes")
     .select("id, nome, email, telefone")
     .in("id", ids)
-    .eq("optout_email", false); 
+    .eq("optout_email", false);
   if (error) throw error;
   return data || [];
 }
@@ -79,19 +81,17 @@ async function getAudienceBySegment({ segment }) {
     let lt = null;
 
     if (segment === "VIP") {
-      gte = VIP_MIN;            // [VIP_MIN, ∞)
+      gte = VIP_MIN; // [VIP_MIN, ∞)
       lt = null;
     } else if (segment === "GOLD") {
-      gte = GOLD_MIN;           // [GOLD_MIN, VIP_MIN)
+      gte = GOLD_MIN; // [GOLD_MIN, VIP_MIN)
       lt = VIP_MIN;
     } else if (segment === "SILVER") {
-      gte = SILVER_MIN;         // [SILVER_MIN, GOLD_MIN)
+      gte = SILVER_MIN; // [SILVER_MIN, GOLD_MIN)
       lt = GOLD_MIN;
     }
 
-    let query = supabase
-      .from("vw_cliente_pontos")
-      .select("cliente_id, pontos");
+    let query = supabase.from("vw_cliente_pontos").select("cliente_id, pontos");
 
     if (gte !== null) query = query.gte("pontos", gte);
     if (lt !== null) query = query.lt("pontos", lt);
@@ -141,8 +141,6 @@ async function getAudienceBySegment({ segment }) {
   // 👇 garante erro claro se vier algo fora da lista
   throw new Error("segment inválido");
 }
-
-
 
 // ---------- ROTAS LITERAIS PRIMEIRO (evitam colisão com /:id) ----------
 
@@ -197,7 +195,9 @@ router.get("/segments", async (req, res) => {
 const sendLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 50,
-  message: { error: "Muitas solicitações de envio. Tente novamente mais tarde." },
+  message: {
+    error: "Muitas solicitações de envio. Tente novamente mais tarde.",
+  },
 });
 
 /**
@@ -232,15 +232,17 @@ const sendLimiter = rateLimit({
  *       200:
  *         description: Resultado do envio (ou pré-visualização)
  */
-router.post("/send-email",
-  auth,          // +++ proteger se desejar
-  sendLimiter,   // +++ rate limit da rota
+router.post(
+  "/send-email",
+  auth, // +++ proteger se desejar
+  sendLimiter, // +++ rate limit da rota
   async (req, res) => {
     try {
       const { segment, subject, message, test_only = false } = req.body || {};
       if (!segment) return badReq(res, "segment é obrigatório");
       if (!SEGMENT_KEYS.has(segment)) return badReq(res, "segment inválido"); // +++
-      if (!subject || !message) return badReq(res, "subject e message são obrigatórios");
+      if (!subject || !message)
+        return badReq(res, "subject e message são obrigatórios");
 
       const audience = await getAudienceBySegment({ segment });
 
@@ -258,39 +260,57 @@ router.post("/send-email",
 
       // +++ envio em lotes pra respeitar limites do SMTP (ajuste LOTE se necessário)
       const LOTE = Number.parseInt(process.env.EMAIL_BATCH_SIZE || "50", 10);
-      let sent = 0, failed = 0;
+      let sent = 0,
+        failed = 0;
 
       for (let i = 0; i < audience.length; i += LOTE) {
         const chunk = audience.slice(i, i + LOTE);
 
         const results = await Promise.allSettled(
           chunk.map((cli) => {
-            if (!cli.email) { failed++; return Promise.resolve(); }
+            if (!cli.email) {
+              failed++;
+              return Promise.resolve();
+            }
             const subj = applyTemplate(subject, cli);
-            const txt  = applyTemplate(message, cli);
+            const txt = applyTemplate(message, cli);
             const html = `<p>${escapeHtml(txt).replace(/\n/g, "<br/>")}</p>`; // +++ escapar
 
             return sendEmail({ to: cli.email, subject: subj, text: txt, html })
-              .then(() => { sent++; })
-              .catch(() => { failed++; });
-          })
+              .then(() => {
+                sent++;
+              })
+              .catch(() => {
+                failed++;
+              });
+          }),
         );
 
         // (opcional) log por lote
         if (process.env.NODE_ENV !== "production") {
-          console.log(`[EMAIL_BATCH] ${i}-${i + chunk.length - 1}`, JSON.stringify(results.map(r => r.status), null, 0));
+          console.log(
+            `[EMAIL_BATCH] ${i}-${i + chunk.length - 1}`,
+            JSON.stringify(
+              results.map((r) => r.status),
+              null,
+              0,
+            ),
+          );
         }
 
         // (opcional) pequena pausa entre lotes
-        const pauseMs = Number.parseInt(process.env.EMAIL_BATCH_PAUSE_MS || "0", 10);
-        if (pauseMs > 0) await new Promise(r => setTimeout(r, pauseMs));
+        const pauseMs = Number.parseInt(
+          process.env.EMAIL_BATCH_PAUSE_MS || "0",
+          10,
+        );
+        if (pauseMs > 0) await new Promise((r) => setTimeout(r, pauseMs));
       }
 
       return ok(res, { segment, total: audience.length, sent, failed });
     } catch (err) {
       return fail(res, err);
     }
-  }
+  },
 );
 
 // ---------- CRUD BASEADO EM BANCO (canônico) ----------
@@ -420,15 +440,27 @@ router.post("/", async (req, res) => {
     } = req.body || {};
 
     // validações mínimas
-    if (!title || !description) return badReq(res, "title e description são obrigatórios");
+    if (!title || !description)
+      return badReq(res, "title e description são obrigatórios");
     if (!isISODate(start_date) || !isISODate(end_date))
-      return badReq(res, "Datas devem ser ISO válidas (YYYY-MM-DD ou ISO 8601)");
+      return badReq(
+        res,
+        "Datas devem ser ISO válidas (YYYY-MM-DD ou ISO 8601)",
+      );
     if (start_date && end_date && new Date(start_date) > new Date(end_date))
       return badReq(res, "start_date não pode ser maior que end_date");
 
     active = parseBool(active);
 
-    const payload = { title, description, type, conditions, active, start_date, end_date };
+    const payload = {
+      title,
+      description,
+      type,
+      conditions,
+      active,
+      start_date,
+      end_date,
+    };
 
     // cria a promoção
     const { data: promo, error: promoErr } = await supabase
@@ -455,8 +487,8 @@ router.post("/", async (req, res) => {
               subject: `Nova promoção: ${title}`,
               text: description,
               html: `<h2>${title}</h2><p>${description}</p>`,
-            })
-          )
+            }),
+          ),
         );
         console.log("[EMAIL_TEST_RESULTS]", JSON.stringify(results, null, 2));
       }
@@ -493,18 +525,13 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    let {
-      title,
-      description,
-      type,
-      conditions,
-      active,
-      start_date,
-      end_date,
-    } = req.body || {};
+    let { title, description, type, conditions, active, start_date, end_date } =
+      req.body || {};
 
-    if (start_date && !isISODate(start_date)) return badReq(res, "start_date inválida");
-    if (end_date && !isISODate(end_date)) return badReq(res, "end_date inválida");
+    if (start_date && !isISODate(start_date))
+      return badReq(res, "start_date inválida");
+    if (end_date && !isISODate(end_date))
+      return badReq(res, "end_date inválida");
     if (start_date && end_date && new Date(start_date) > new Date(end_date))
       return badReq(res, "start_date não pode ser maior que end_date");
 
@@ -571,12 +598,15 @@ if (process.env.USE_PROMO_MOCK === "true") {
 
   router.get("/mock", (req, res) => ok(res, { items: mockPromotions }));
   router.get("/mock/:id", (req, res) => {
-    const item = mockPromotions.find((p) => String(p.id) === String(req.params.id));
+    const item = mockPromotions.find(
+      (p) => String(p.id) === String(req.params.id),
+    );
     return item ? ok(res, { item }) : notFound(res);
   });
   router.post("/mock", async (req, res) => {
     const { title, description } = req.body || {};
-    if (!title || !description) return badReq(res, "title e description são obrigatórios");
+    if (!title || !description)
+      return badReq(res, "title e description são obrigatórios");
     const newPromo = {
       id: (mockPromotions.length + 1).toString(),
       title,

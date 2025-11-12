@@ -1,5 +1,4 @@
-// src/controllers/ReportController.js
-import supabase from "../config/database.js";
+const supabase = require("../config/database");
 
 /**
  * Relatório Financeiro — endpoints para gráficos
@@ -18,13 +17,16 @@ const round2 = (n) => Number((n || 0).toFixed(2));
 
 // --- mapping de enum (mesma ideia do TransactionController) ---
 const [DB_CREDIT_RAW, DB_DEBIT_RAW] = String(
-  process.env.TRANSACTION_TYPE_DB_VALUES || "entrada,saida"
+  process.env.TRANSACTION_TYPE_DB_VALUES || "entrada,saida",
 ).split(",");
 const DB_CREDIT = (DB_CREDIT_RAW || "entrada").trim();
-const DB_DEBIT  = (DB_DEBIT_RAW  || "saida").trim();
-const norm = (s) => String(s ?? "").toLowerCase().trim();
+const DB_DEBIT = (DB_DEBIT_RAW || "saida").trim();
+const norm = (s) =>
+  String(s ?? "")
+    .toLowerCase()
+    .trim();
 const isCreditDB = (t) => norm(t) === norm(DB_CREDIT);
-const isDebitDB  = (t) => norm(t) === norm(DB_DEBIT);
+const isDebitDB = (t) => norm(t) === norm(DB_DEBIT);
 
 // ---------- FALLBACKS (sem RPC) ----------
 async function fallbackSummary(start_date, end_date) {
@@ -36,7 +38,8 @@ async function fallbackSummary(start_date, end_date) {
 
   if (error) throw error;
 
-  let credit = 0, debit = 0;
+  let credit = 0,
+    debit = 0;
   for (const r of data || []) {
     const amt = Number(r.amount) || 0;
     if (isCreditDB(r.type)) credit += amt;
@@ -66,7 +69,13 @@ async function fallbackSummaryByCategory(start_date, end_date, expandCategory) {
   const acc = new Map(); // key: category_id -> { category_id, total_credit, total_debit, balance }
   for (const r of data || []) {
     const key = r.category_id ?? null;
-    if (!acc.has(key)) acc.set(key, { category_id: key, total_credit: 0, total_debit: 0, balance: 0 });
+    if (!acc.has(key))
+      acc.set(key, {
+        category_id: key,
+        total_credit: 0,
+        total_debit: 0,
+        balance: 0,
+      });
     const item = acc.get(key);
     const amt = Number(r.amount) || 0;
     if (isCreditDB(r.type)) item.total_credit += amt;
@@ -82,7 +91,9 @@ async function fallbackSummaryByCategory(start_date, end_date, expandCategory) {
 
   // opcional: expandir nomes de categorias (sem FK)
   if (expandCategory) {
-    const ids = [...new Set(rows.map((r) => r.category_id).filter((v) => v != null))];
+    const ids = [
+      ...new Set(rows.map((r) => r.category_id).filter((v) => v != null)),
+    ];
     let byId = {};
     if (ids.length) {
       const { data: cats, error: cErr } = await supabase
@@ -94,7 +105,8 @@ async function fallbackSummaryByCategory(start_date, end_date, expandCategory) {
     }
     rows = rows.map((r) => ({
       ...r,
-      category_name: r.category_id == null ? "Sem categoria" : (byId[r.category_id] ?? null),
+      category_name:
+        r.category_id == null ? "Sem categoria" : (byId[r.category_id] ?? null),
     }));
   }
 
@@ -102,12 +114,15 @@ async function fallbackSummaryByCategory(start_date, end_date, expandCategory) {
 }
 
 // ---------- ENDPOINTS ----------
-export async function getSummary(req, res) {
+const getSummary = async (req, res) => {
   try {
     const { start_date, end_date } = req.query;
 
     if (!start_date || !end_date) {
-      return badRequest(res, "Os parâmetros 'start_date' e 'end_date' são obrigatórios (YYYY-MM-DD).");
+      return badRequest(
+        res,
+        "Os parâmetros 'start_date' e 'end_date' são obrigatórios (YYYY-MM-DD).",
+      );
     }
     if (!isISODate(start_date) || !isISODate(end_date)) {
       return badRequest(res, "Datas inválidas. Use o formato YYYY-MM-DD.");
@@ -130,14 +145,17 @@ export async function getSummary(req, res) {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-}
+};
 
-export async function getSummaryByCategory(req, res) {
+const getSummaryByCategory = async (req, res) => {
   try {
     const { start_date, end_date, expand } = req.query;
 
     if (!start_date || !end_date) {
-      return badRequest(res, "Os parâmetros 'start_date' e 'end_date' são obrigatórios (YYYY-MM-DD).");
+      return badRequest(
+        res,
+        "Os parâmetros 'start_date' e 'end_date' são obrigatórios (YYYY-MM-DD).",
+      );
     }
     if (!isISODate(start_date) || !isISODate(end_date)) {
       return badRequest(res, "Datas inválidas. Use o formato YYYY-MM-DD.");
@@ -159,11 +177,18 @@ export async function getSummaryByCategory(req, res) {
       .map((s) => s.trim().toLowerCase())
       .includes("category");
 
-    const fb = await fallbackSummaryByCategory(start_date, end_date, wantCategory);
+    const fb = await fallbackSummaryByCategory(
+      start_date,
+      end_date,
+      wantCategory,
+    );
     return res.status(200).json(fb);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-}
+};
 
-export default { getSummary, getSummaryByCategory };
+module.exports = {
+  getSummary,
+  getSummaryByCategory,
+};

@@ -1,17 +1,17 @@
-const supabase = require('../config/database');
+const supabase = require("../config/database");
 
 class UserModel {
   // Criar novo usuário
   static async create(userData) {
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from("users")
         .insert([
           {
             name: userData.name,
             email: userData.email,
-            password: userData.password
-          }
+            password: userData.password,
+          },
         ])
         .select()
         .single();
@@ -30,12 +30,13 @@ class UserModel {
   static async findByEmail(email) {
     try {
       const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', email)
+        .from("users")
+        .select("*")
+        .eq("email", email)
         .single();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = não encontrado
+      if (error && error.code !== "PGRST116") {
+        // PGRST116 = não encontrado
         throw new Error(error.message);
       }
 
@@ -49,12 +50,12 @@ class UserModel {
   static async findById(id) {
     try {
       const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', id)
+        .from("users")
+        .select("*")
+        .eq("id", id)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error && error.code !== "PGRST116") {
         throw new Error(error.message);
       }
 
@@ -68,9 +69,9 @@ class UserModel {
   static async update(id, updateData) {
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from("users")
         .update(updateData)
-        .eq('id', id)
+        .eq("id", id)
         .select()
         .single();
 
@@ -88,9 +89,9 @@ class UserModel {
   static async findAll() {
     try {
       const { data, error } = await supabase
-        .from('users')
-        .select('id, name, email, created_at, updated_at')
-        .order('created_at', { ascending: false });
+        .from("users")
+        .select("id, name, email, created_at, updated_at")
+        .order("created_at", { ascending: false });
 
       if (error) {
         throw new Error(error.message);
@@ -105,16 +106,13 @@ class UserModel {
   // Deletar usuário
   static async delete(id) {
     try {
-      const { error } = await supabase
-        .from('users')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from("users").delete().eq("id", id);
 
       if (error) {
         throw new Error(error.message);
       }
 
-      return { message: 'Usuário deletado com sucesso' };
+      return { message: "Usuário deletado com sucesso" };
     } catch (error) {
       throw error;
     }

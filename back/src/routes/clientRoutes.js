@@ -7,8 +7,10 @@ const ClientsService = require("../services/clients.service");
 const ok = (res, data) => res.json(data);
 const created = (res, data) => res.status(201).json(data);
 const badReq = (res, msg) => res.status(400).json({ error: msg });
-const notFound = (res, msg = "Cliente não encontrado") => res.status(404).json({ error: msg });
-const fail = (res, err) => res.status(500).json({ message: "Erro interno", error: err?.message });
+const notFound = (res, msg = "Cliente não encontrado") =>
+  res.status(404).json({ error: msg });
+const fail = (res, err) =>
+  res.status(500).json({ message: "Erro interno", error: err?.message });
 
 /**
  * @swagger
@@ -132,7 +134,10 @@ router.post("/", async (req, res) => {
 /** PUT /api/clients/:id */
 router.put("/:id", async (req, res) => {
   try {
-    const item = await ClientsService.updateCliente(req.params.id, req.body || {});
+    const item = await ClientsService.updateCliente(
+      req.params.id,
+      req.body || {},
+    );
     if (!item) return notFound(res);
     return ok(res, { item });
   } catch (err) {

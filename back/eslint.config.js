@@ -1,40 +1,18 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import { defineConfig, globalIgnores } from 'eslint/config'
-
-export default defineConfig([
-  globalIgnores(['dist']),
+// Flat config compatible with ESLint's flat configuration loader.
+// We keep the config minimal and avoid importing '@eslint/js' or 'eslint/config'
+// so it works across ESLint versions that may restrict package exports.
+module.exports = [
   {
-    files: ['**/*.{js,jsx}'],
-    extends: [
-      js.configs.recommended,
-      reactHooks.configs['recommended-latest'],
-      reactRefresh.configs.vite,
-    ],
+    files: ["**/*.js"],
+    ignores: ["dist", "node_modules", ".next"],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
-      },
+      sourceType: "module",
+      globals: { process: true, Buffer: true, console: true },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      "no-unused-vars": ["error", { varsIgnorePattern: "^[A-Z_]" }],
+      "no-console": "off",
     },
   },
-  // Configuração para o Backend - Para as variáveis globais do Node.js
-  {
-    files: ['Server.js', 'src/controllers/**/*.js', 'src/routes/**/*.js', 'src/services/**/*.js'],
-    languageOptions: {
-        globals: globals.node, // Informa que o ambiente é Node.js
-        sourceType: 'module'
-    },
-    rules: {
-        'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-    }
-  }
-])
+];

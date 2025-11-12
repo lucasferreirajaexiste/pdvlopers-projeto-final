@@ -1,20 +1,26 @@
-import express from "express";
+const express = require("express");
 
-import {
+const {
   createTransaction,
   getTransactions,
   getTransaction,
   updateTransaction,
   deleteTransaction,
   getCategories,
-} from "../controllers/TransactionController.js";
-import { getSummary, getSummaryByCategory } from "../controllers/ReportController.js";
+} = require("../controllers/TransactionController");
+const {
+  getSummary,
+  getSummaryByCategory,
+} = require("../controllers/ReportController");
 
 const router = express.Router();
 
 // logger para depuração (remova/ajuste em produção)
 router.use((req, _res, next) => {
-  console.log(`[financialRoutes] ${req.method} ${req.originalUrl} - body:`, req.body);
+  console.log(
+    `[financialRoutes] ${req.method} ${req.originalUrl} - body:`,
+    req.body,
+  );
   next();
 });
 
@@ -275,4 +281,4 @@ router.get("/summary", getSummary);
  */
 router.get("/summary/by-category", getSummaryByCategory);
 
-export default router;
+module.exports = router;

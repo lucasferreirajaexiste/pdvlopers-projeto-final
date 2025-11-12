@@ -20,7 +20,9 @@ const redeemSchema = Joi.object({
   clientId: Joi.alternatives()
     .try(Joi.number().integer().positive(), Joi.string().pattern(/^\d+$/))
     .required(),
-  rewardId: Joi.string().guid({ version: ["uuidv4", "uuidv5", "uuidv1"] }).required(),
+  rewardId: Joi.string()
+    .guid({ version: ["uuidv4", "uuidv5", "uuidv1"] })
+    .required(),
   description: Joi.string().allow("").optional(),
 });
 
@@ -76,7 +78,7 @@ async function getBalance(clientId) {
 
     const total = (data || []).reduce(
       (acc, r) => acc + (r.type === "earn" ? r.points : -r.points),
-      0
+      0,
     );
     return total;
   } catch (err) {
@@ -94,7 +96,8 @@ async function getClientPoints(req, res) {
   try {
     const { clientId } = req.params;
     const { exists, id } = await ensureClientExists(clientId);
-    if (!exists) return res.status(404).json({ error: "Cliente não encontrado" });
+    if (!exists)
+      return res.status(404).json({ error: "Cliente não encontrado" });
 
     const points = await getBalance(id);
     return res.json({ clientId: id, points });
@@ -110,14 +113,19 @@ async function getClientPoints(req, res) {
  */
 async function addPoints(req, res) {
   try {
-    const payload = await earnSchema.validateAsync(req.body, { convert: true, abortEarly: false });
+    const payload = await earnSchema.validateAsync(req.body, {
+      convert: true,
+      abortEarly: false,
+    });
     const client_id = Number(payload.clientId);
     const amount = Number(payload.amount);
-    const description = payload.description || `Compra de R$${amount.toFixed(2)}`;
+    const description =
+      payload.description || `Compra de R$${amount.toFixed(2)}`;
 
     // valida cliente
     const { exists } = await ensureClientExists(client_id);
-    if (!exists) return res.status(404).json({ error: "Cliente não encontrado" });
+    if (!exists)
+      return res.status(404).json({ error: "Cliente não encontrado" });
 
     // calcula pontos
     const points = Math.floor(amount * 0.1);
@@ -130,7 +138,9 @@ async function addPoints(req, res) {
 
     if (error) {
       console.error("addPoints supabase insert error:", error);
-      return res.status(400).json({ error: error.message || "Erro ao registrar pontos" });
+      return res
+        .status(400)
+        .json({ error: error.message || "Erro ao registrar pontos" });
     }
 
     // saldo atualizado
@@ -142,7 +152,9 @@ async function addPoints(req, res) {
     });
   } catch (err) {
     if (err.isJoi) {
-      return res.status(400).json({ error: err.details.map(d => d.message).join(", ") });
+      return res
+        .status(400)
+        .json({ error: err.details.map((d) => d.message).join(", ") });
     }
     console.error("addPoints unexpected error:", err);
     return res.status(500).json({ error: err.message || "Erro interno" });
@@ -155,12 +167,16 @@ async function addPoints(req, res) {
  */
 async function redeemPoints(req, res) {
   try {
-    const payload = await redeemSchema.validateAsync(req.body, { convert: true, abortEarly: false });
+    const payload = await redeemSchema.validateAsync(req.body, {
+      convert: true,
+      abortEarly: false,
+    });
     const client_id = Number(payload.clientId);
     const { rewardId, description } = payload;
 
     const { exists } = await ensureClientExists(client_id);
-    if (!exists) return res.status(404).json({ error: "Cliente não encontrado" });
+    if (!exists)
+      return res.status(404).json({ error: "Cliente não encontrado" });
 
     // busca reward
     const { data: reward, error: rewardErr } = await supabase
@@ -171,9 +187,12 @@ async function redeemPoints(req, res) {
 
     if (rewardErr) {
       console.error("redeemPoints reward lookup error:", rewardErr);
-      return res.status(500).json({ error: rewardErr.message || "Erro ao buscar brinde" });
+      return res
+        .status(500)
+        .json({ error: rewardErr.message || "Erro ao buscar brinde" });
     }
-    if (!reward) return res.status(404).json({ error: "Brinde não encontrado" });
+    if (!reward)
+      return res.status(404).json({ error: "Brinde não encontrado" });
 
     // verifica saldo
     const current = await getBalance(client_id);
@@ -184,31 +203,41 @@ async function redeemPoints(req, res) {
     // registra transação de resgate
     const { data, error } = await supabase
       .from("loyalty_transactions")
-      .insert([{
-        client_id,
-        type: "redeem",
-        points: reward.points_required,
-        reward_id: reward.id,
-        description: description || reward.name,
-      }])
+      .insert([
+        {
+          client_id,
+          type: "redeem",
+          points: reward.points_required,
+          reward_id: reward.id,
+          description: description || reward.name,
+        },
+      ])
       .select()
       .single();
 
     if (error) {
       console.error("redeemPoints supabase insert error:", error);
-      return res.status(400).json({ error: error.message || "Erro ao registrar resgate" });
+      return res
+        .status(400)
+        .json({ error: error.message || "Erro ao registrar resgate" });
     }
 
     const newBalance = await getBalance(client_id);
     return res.status(201).json({
       message: "Pontos resgatados com sucesso",
       item: data,
-      reward: { id: reward.id, name: reward.name, cost: reward.points_required },
+      reward: {
+        id: reward.id,
+        name: reward.name,
+        cost: reward.points_required,
+      },
       balance: newBalance,
     });
   } catch (err) {
     if (err.isJoi) {
-      return res.status(400).json({ error: err.details.map(d => d.message).join(", ") });
+      return res
+        .status(400)
+        .json({ error: err.details.map((d) => d.message).join(", ") });
     }
     console.error("redeemPoints unexpected error:", err);
     return res.status(500).json({ error: err.message || "Erro interno" });
@@ -220,10 +249,15 @@ async function redeemPoints(req, res) {
  */
 async function listRewards(_req, res) {
   try {
-    const { data, error } = await supabase.from("rewards").select("*").order("created_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("rewards")
+      .select("*")
+      .order("created_at", { ascending: false });
     if (error) {
       console.error("listRewards supabase error:", error);
-      return res.status(500).json({ error: error.message || "Erro ao listar brindes" });
+      return res
+        .status(500)
+        .json({ error: error.message || "Erro ao listar brindes" });
     }
     return res.json(data || []);
   } catch (err) {
@@ -237,7 +271,9 @@ async function listRewards(_req, res) {
  */
 async function createReward(req, res) {
   try {
-    const payload = await rewardCreateSchema.validateAsync(req.body, { abortEarly: false });
+    const payload = await rewardCreateSchema.validateAsync(req.body, {
+      abortEarly: false,
+    });
     const { name, description, points_required } = payload;
 
     const { data, error } = await supabase
@@ -248,12 +284,16 @@ async function createReward(req, res) {
 
     if (error) {
       console.error("createReward supabase insert error:", error);
-      return res.status(400).json({ error: error.message || "Erro ao criar brinde" });
+      return res
+        .status(400)
+        .json({ error: error.message || "Erro ao criar brinde" });
     }
     return res.status(201).json(data);
   } catch (err) {
     if (err.isJoi) {
-      return res.status(400).json({ error: err.details.map(d => d.message).join(", ") });
+      return res
+        .status(400)
+        .json({ error: err.details.map((d) => d.message).join(", ") });
     }
     console.error("createReward unexpected error:", err);
     return res.status(500).json({ error: err.message || "Erro interno" });
@@ -266,10 +306,16 @@ async function createReward(req, res) {
 async function getRewardById(req, res) {
   try {
     const { id } = req.params;
-    const { data, error } = await supabase.from("rewards").select("*").eq("id", id).maybeSingle();
+    const { data, error } = await supabase
+      .from("rewards")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
     if (error) {
       console.error("getRewardById supabase error:", error);
-      return res.status(500).json({ error: error.message || "Erro ao buscar brinde" });
+      return res
+        .status(500)
+        .json({ error: error.message || "Erro ao buscar brinde" });
     }
     if (!data) return res.status(404).json({ error: "Brinde não encontrado" });
     return res.json(data);
@@ -285,7 +331,9 @@ async function getRewardById(req, res) {
 async function updateReward(req, res) {
   try {
     const { id } = req.params;
-    const patch = await rewardUpdateSchema.validateAsync(req.body, { abortEarly: false });
+    const patch = await rewardUpdateSchema.validateAsync(req.body, {
+      abortEarly: false,
+    });
 
     const { data, error } = await supabase
       .from("rewards")
@@ -296,12 +344,20 @@ async function updateReward(req, res) {
 
     if (error) {
       console.error("updateReward supabase error:", error);
-      return res.status(400).json({ error: error.message || "Erro ao atualizar brinde" });
+      return res
+        .status(400)
+        .json({ error: error.message || "Erro ao atualizar brinde" });
     }
-    if (!data) return res.status(404).json({ error: "Brinde não encontrado ou erro ao atualizar" });
+    if (!data)
+      return res
+        .status(404)
+        .json({ error: "Brinde não encontrado ou erro ao atualizar" });
     return res.json(data);
   } catch (err) {
-    if (err.isJoi) return res.status(400).json({ error: err.details.map(d => d.message).join(", ") });
+    if (err.isJoi)
+      return res
+        .status(400)
+        .json({ error: err.details.map((d) => d.message).join(", ") });
     console.error("updateReward unexpected error:", err);
     return res.status(500).json({ error: err.message || "Erro interno" });
   }
@@ -316,7 +372,9 @@ async function deleteReward(req, res) {
     const { error } = await supabase.from("rewards").delete().eq("id", id);
     if (error) {
       console.error("deleteReward supabase error:", error);
-      return res.status(400).json({ error: error.message || "Erro ao deletar brinde" });
+      return res
+        .status(400)
+        .json({ error: error.message || "Erro ao deletar brinde" });
     }
     return res.json({ message: "Brinde deletado com sucesso" });
   } catch (err) {
@@ -332,7 +390,8 @@ async function getHistory(req, res) {
   try {
     const { clientId } = req.params;
     const { exists, id } = await ensureClientExists(clientId);
-    if (!exists) return res.status(404).json({ error: "Cliente não encontrado" });
+    if (!exists)
+      return res.status(404).json({ error: "Cliente não encontrado" });
 
     const { data, error } = await supabase
       .from("loyalty_transactions")
@@ -342,7 +401,9 @@ async function getHistory(req, res) {
 
     if (error) {
       console.error("getHistory supabase error:", error);
-      return res.status(500).json({ error: error.message || "Erro ao buscar histórico" });
+      return res
+        .status(500)
+        .json({ error: error.message || "Erro ao buscar histórico" });
     }
     return res.json(data || []);
   } catch (err) {

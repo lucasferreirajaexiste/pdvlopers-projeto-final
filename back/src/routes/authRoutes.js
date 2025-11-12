@@ -11,7 +11,8 @@ const twoFA = require("../controllers/2fa.controller");
 const authMiddleware = require("../middleware/authMiddleware");
 
 // Helper para propagar erros async ao errorHandler global
-const asyncHandler = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
+const asyncHandler = (fn) => (req, res, next) =>
+  Promise.resolve(fn(req, res, next)).catch(next);
 
 /**
  * @swagger

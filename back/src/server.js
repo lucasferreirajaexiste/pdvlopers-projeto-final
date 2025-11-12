@@ -7,6 +7,7 @@ const helmet = require("helmet");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 
+const createApiKeyMiddleware = require("./middleware/apiKeyMiddleware");
 const { errorHandler, notFound } = require("./middleware/errorMiddleware");
 const swaggerSetup = require("./config/swagger");
 
@@ -33,6 +34,11 @@ const unwrapDefault = (m) => (m && m.__esModule && m.default ? m.default : m);
 app.use(helmet()); // se o Swagger reclamar de CSP: helmet({ contentSecurityPolicy: false })
 app.use(compression());
 
+// When running behind a proxy (Vercel, Netlify, etc.), enable trust proxy
+// so express-rate-limit and other middleware can use X-Forwarded-* headers.
+// Use a sensible default (1) to trust the immediate proxy.
+app.set("trust proxy", 1);
+
 // CORS (múltiplas origens via FRONTEND_URL=dom1,dom2)
 const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:3001")
   .split(",")
@@ -43,12 +49,15 @@ app.use(
   cors({
     origin: allowedOrigins,
     credentials: true,
-  })
+  }),
 );
 
 // Rate limiting global
 const limiter = rateLimit({
-  windowMs: Number.parseInt(process.env.RATE_LIMIT_WINDOW_MS || `${15 * 60 * 1000}`, 10),
+  windowMs: Number.parseInt(
+    process.env.RATE_LIMIT_WINDOW_MS || `${15 * 60 * 1000}`,
+    10,
+  ),
   max: Number.parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || "100", 10),
   message: "Muitas requisições, tente novamente mais tarde.",
 });
@@ -58,15 +67,69 @@ app.use(limiter);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
+// ---------- API Key protection (optional) ----------
+const apiKeyEnv = process.env.API_KEYS || process.env.API_KEY || "";
+if (apiKeyEnv.trim()) {
+  const apiKeys = apiKeyEnv
+    .split(",")
+    .map((key) => key.trim())
+    .filter(Boolean);
+
+  const headerName = process.env.API_KEY_HEADER || "x-api-key";
+  const queryParam = process.env.API_KEY_QUERY || "api_key";
+
+  const publicExact = new Set(["/", "/health", "/api-docs.json"]);
+  const publicPrefixes = ["/api-docs", "/favicon"];
+
+  app.use(
+    createApiKeyMiddleware({
+      keys: apiKeys,
+      headerName,
+      queryParam,
+      skip: (req) => {
+        if (req.method === "OPTIONS") return true;
+        const path = req.path || req.originalUrl || "";
+        if (publicExact.has(path)) return true;
+        return publicPrefixes.some((prefix) => path.startsWith(prefix));
+      },
+    }),
+  );
+}
+
 // ---------- Swagger ----------
 // Monta a UI em /api-docs e expõe /api-docs.json
-// Se o Helmet bloquear a UI por causa de Content-Security-Policy, ajuste:
-// app.use(helmet({ contentSecurityPolicy: false }))
-if (swaggerSetup && typeof swaggerSetup.setup === "function") {
-  swaggerSetup.setup(app, "/api-docs");
-} else if (typeof swaggerSetup === "function") {
-  // compatibilidade com versão antiga
-  swaggerSetup(app);
+// In production (e.g., Vercel), the platform injects a live preview script which
+// can be blocked by strict CSP and cause console errors. To avoid noisy CSP or
+// injected-script errors in production, we disable the interactive Swagger UI
+// unless explicitly enabled by SWAGGER_ENABLE=true.
+const enableSwagger =
+  process.env.SWAGGER_ENABLE === "true" ||
+  process.env.NODE_ENV !== "production";
+if (enableSwagger) {
+  // Remove CSP header for the /api-docs route only so injected preview scripts
+  // (like Vercel's overlay) won't be blocked. This keeps a sensible CSP for
+  // the rest of the app while allowing the docs UI to load in environments
+  // where previews are used.
+  app.use("/api-docs", (req, res, next) => {
+    try {
+      res.removeHeader("Content-Security-Policy");
+      res.removeHeader("content-security-policy");
+    } catch (e) {
+      // ignore if headers can't be removed
+    }
+    next();
+  });
+
+  if (swaggerSetup && typeof swaggerSetup.setup === "function") {
+    swaggerSetup.setup(app, "/api-docs");
+  } else if (typeof swaggerSetup === "function") {
+    // compatibilidade com versão antiga
+    swaggerSetup(app);
+  }
+} else {
+  console.log(
+    "[boot] Swagger UI is disabled (set SWAGGER_ENABLE=true to enable).",
+  );
 }
 
 // ---------- Health / Root ----------
@@ -88,12 +151,17 @@ const loyaltyRoutes = require("./routes/loyaltyRoutes");
 const promotionRoutes = require("./routes/promotionRoutes");
 
 // Clients (compat: clientRoutes OU clienteRoutes)
-const clientRoutes = tryRequire("./routes/clientRoutes", "./routes/clienteRoutes");
+const clientRoutes = tryRequire(
+  "./routes/clientRoutes",
+  "./routes/clienteRoutes",
+);
 if (!clientRoutes) {
-  console.warn("[boot] Rotas de clientes não encontradas (clientRoutes/clienteRoutes).");
+  console.warn(
+    "[boot] Rotas de clientes não encontradas (clientRoutes/clienteRoutes).",
+  );
 } else {
   app.use("/api/clients", clientRoutes); // canônico
-  app.use("/clientes", clientRoutes);    // compat
+  app.use("/clientes", clientRoutes); // compat
 }
 
 app.use("/api/auth", authRoutes);
@@ -102,13 +170,15 @@ app.use("/api/promotions", promotionRoutes);
 
 // Financial (carrega se existir em algum dos caminhos)
 const financialModule = tryRequire(
-  "./routes/financialRoutes",       // CJS padrão do seu projeto
-  "./routes/FinancialRoutes",       // PascalCase
-  "./src/routes/FinancialRoutes",   // caso tenha vindo de outro server
-  "../src/routes/FinancialRoutes"
+  "./routes/financialRoutes", // CJS padrão do seu projeto
+  "./routes/FinancialRoutes", // PascalCase
+  "./src/routes/FinancialRoutes", // caso tenha vindo de outro server
+  "../src/routes/FinancialRoutes",
 );
 if (!financialModule) {
-  console.warn("[boot] Rotas financeiras não encontradas. Pulei /api/financial e /api/finance.");
+  console.warn(
+    "[boot] Rotas financeiras não encontradas. Pulei /api/financial e /api/finance.",
+  );
 } else {
   const financialRoutes = unwrapDefault(financialModule);
   app.use("/api/financial", financialRoutes);
@@ -120,9 +190,15 @@ app.use(notFound);
 app.use(errorHandler);
 
 // ---------- Start ----------
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
-  console.log(`📚 Documentação: http://localhost:${PORT}/api-docs`);
-});
+// Start the server only when this file is run directly.
+// This prevents the app from calling `listen` when required as a module
+// (e.g., importing in a serverless handler like Vercel). The app is
+// still exported below so platforms can mount it as a handler.
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor rodando na porta ${PORT}`);
+    console.log(`📚 Documentação: http://localhost:${PORT}/api-docs`);
+  });
+}
 
 module.exports = app;

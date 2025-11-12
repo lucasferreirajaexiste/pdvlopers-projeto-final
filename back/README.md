@@ -20,14 +20,14 @@ API REST para o sistema de gestão de fidelidade, promoções e operações de p
 
 ## 👥 Equipe Backend
 
-| Desenvolvedor    | Responsabilidade                | Arquivos Principais                                      |
-|------------------|---------------------------------|----------------------------------------------------------|
-| **Geraldo**      | Autenticação & Segurança        | `src/routes/authRoutes.js`, `src/middleware/authMiddleware.js` |
-| **Fabio N.**     | Gestão de Clientes              | `src/routes/clientRoutes.js`, `src/models/Client.js`     |
-| **Felipe F.**    | Controle de Fidelidade          | `src/routes/loyaltyRoutes.js`, `src/models/LoyaltyTransaction.js` |
-| **João Jacques** | Promoções & Comunicação         | `src/routes/promotionRoutes.js`, `src/models/Promotion.js` |
-| **Helen**        | Financeiro                      | `src/routes/financialRoutes.js`, `src/models/FinancialTransaction.js` |
-| **Jose Felipe**  | Infraestrutura & Documentação   | `Dockerfile`, `docker-compose.yml`, `.github/workflows/` |
+| Desenvolvedor    | Responsabilidade              | Arquivos Principais                                                   |
+| ---------------- | ----------------------------- | --------------------------------------------------------------------- |
+| **Geraldo**      | Autenticação & Segurança      | `src/routes/authRoutes.js`, `src/middleware/authMiddleware.js`        |
+| **Fabio N.**     | Gestão de Clientes            | `src/routes/clientRoutes.js`, `src/models/Client.js`                  |
+| **Felipe F.**    | Controle de Fidelidade        | `src/routes/loyaltyRoutes.js`, `src/models/LoyaltyTransaction.js`     |
+| **João Jacques** | Promoções & Comunicação       | `src/routes/promotionRoutes.js`, `src/models/Promotion.js`            |
+| **Helen**        | Financeiro                    | `src/routes/financialRoutes.js`, `src/models/FinancialTransaction.js` |
+| **Jose Felipe**  | Infraestrutura & Documentação | `Dockerfile`, `docker-compose.yml`, `.github/workflows/`              |
 
 ---
 
@@ -42,31 +42,35 @@ API REST para o sistema de gestão de fidelidade, promoções e operações de p
 ### Passos
 
 1. **Clone o repositório**
-    ```bash
-    git clone <repository-url>
-    cd mercadinho-vip-backend
-    ```
+
+   ```bash
+   git clone <repository-url>
+   cd mercadinho-vip-backend
+   ```
 
 2. **Instale as dependências**
-    ```bash
-    npm install
-    ```
+
+   ```bash
+   npm install
+   ```
 
 3. **Configure as variáveis de ambiente**
-    ```bash
-    cp .env.example .env
-    # Edite o arquivo .env conforme necessário
-    ```
+
+   ```bash
+   cp .env.example .env
+   # Edite o arquivo .env conforme necessário
+   ```
 
 4. **Execute as migrações do banco**
-    ```bash
-    # Execute os arquivos SQL em database/migrations/ no Supabase
-    ```
+
+   ```bash
+   # Execute os arquivos SQL em database/migrations/ no Supabase
+   ```
 
 5. **Inicie o servidor**
-    ```bash
-    npm run dev
-    ```
+   ```bash
+   npm run dev
+   ```
 
 ---
 
@@ -85,6 +89,7 @@ docker-compose up -d
 ## 📚 Documentação
 
 A documentação da API está disponível em:
+
 - **Desenvolvimento**: http://localhost:3000/api-docs
 - **Produção**: https://api.mercadinhovip.com/api-docs
 
@@ -170,6 +175,7 @@ Authorization: Bearer <seu-jwt-token>
 ## 🚀 Deploy
 
 Deploy automatizado via GitHub Actions:
+
 - **Staging**: Branch `develop`
 - **Produção**: Branch `main`
 
