@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styles from "./MessageModal.module.css";
 import { Header } from "../../Finance/Header";
+import { API_BASE_URL } from "../../../services/api";
 
 const MAX_MESSAGE_LENGTH = 360;
 
@@ -30,17 +31,14 @@ export function MessageModal({ isOpen, onClose }) {
 
             const token = localStorage.getItem("token");
 
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/promotions/send-email`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
-                    },
-                    body: JSON.stringify(data),
-                }
-            );
+            const response = await fetch(`${API_BASE_URL}/promotions/send-email`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(data),
+            });
 
             if (!response.ok) {
                 throw new Error("Erro ao enviar mensagem");

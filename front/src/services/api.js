@@ -1,7 +1,9 @@
 import axios from "axios";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const API_ROOT_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:3000"
+).replace(/\/$/, "");
+const API_BASE_URL = `${API_ROOT_URL}/api`;
 const API_KEY = import.meta.env.VITE_API_KEY;
 
 const api = axios.create({
@@ -159,4 +161,5 @@ export const deletePromotion = (id) =>
 // Categories 
 export const getCategories = () => apiRequest("GET", "/financial/categories");
 
+export { API_ROOT_URL, API_BASE_URL };
 export default api;
