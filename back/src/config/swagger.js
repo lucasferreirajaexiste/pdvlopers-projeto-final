@@ -1,3 +1,4 @@
+const path = require("path");
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
@@ -6,6 +7,13 @@ const localPort = process.env.PORT || 3000;
 const swaggerServerUrl =
   process.env.SWAGGER_SERVER_URL ||
   (isProduction ? "/" : `http://localhost:${localPort}`);
+
+const sourceRoot = path.resolve(__dirname, "..");
+const apiGlobs = [
+  path.join(sourceRoot, "routes", "**/*.js"),
+  path.join(sourceRoot, "controllers", "**/*.js"),
+  path.join(sourceRoot, "middleware", "**/*.js"),
+];
 
 const options = {
   definition: {
@@ -51,8 +59,9 @@ const options = {
       },
     ],
   },
-  // Use um padrão mais abrangente para capturar rotas e modelos em subpastas
-  apis: ["./src/**/*.js"],
+  // Use um caminho absoluto baseado no arquivo atual para garantir que o Vercel
+  // bundle encontre os arquivos mesmo quando o cwd muda.
+  apis: apiGlobs,
 };
 
 const specs = swaggerJsdoc(options);
