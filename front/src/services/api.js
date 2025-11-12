@@ -6,16 +6,30 @@ const API_KEY = import.meta.env.VITE_API_KEY;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: API_KEY ? { "x-api-key": API_KEY } : undefined,
 });
 
 // request interceptor: adiciona auth e log
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  if (API_KEY && !config.headers["x-api-key"]) {
-    config.headers["x-api-key"] = API_KEY;
+  const headers = config.headers || {};
+
+  if (token) {
+    if (typeof headers.set === "function") {
+      headers.set("Authorization", `Bearer ${token}`);
+    } else {
+      headers.Authorization = `Bearer ${token}`;
+    }
   }
+
+  if (API_KEY) {
+    if (typeof headers.set === "function") {
+      headers.set("x-api-key", API_KEY);
+    } else {
+      headers["x-api-key"] = API_KEY;
+    }
+  }
+
+  config.headers = headers;
   console.log(
     "[API] request:",
     (config.method || "GET").toUpperCase(),
