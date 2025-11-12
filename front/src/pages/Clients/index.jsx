@@ -1,7 +1,95 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./clients.module.css";
 import { Layout } from "../../components/Layout/Layout";
-import { getClients } from "../../services/api";
+import {
+  createClient,
+  deleteClient,
+  getClients,
+  updateClient,
+} from "../../services/api";
+
+const stripNonDigits = (value = "") => value.replace(/\D/g, "");
+
+const parseEndereco = (value) => {
+  if (!value) return {};
+  if (typeof value === "object" && !Array.isArray(value)) return value;
+  try {
+    const parsed = JSON.parse(value);
+    if (parsed && typeof parsed === "object") return parsed;
+  } catch (err) {
+    // ignore parse errors and fallback to string
+  }
+  return { formatted: String(value) };
+};
+
+const normalizeCliente = (item = {}) => {
+  const address = parseEndereco(item.endereco);
+  return {
+    id: item.id,
+    nome: item.nome || item.name || "",
+    cpf: item.cpf || "",
+    email: item.email || "",
+    telefone: item.telefone || "",
+    compras: item.compras || 0,
+    created_at: item.created_at || item.createdAt || null,
+    address,
+  };
+};
+
+const calcularPontos = (cliente) => {
+  if (typeof cliente?.points === "number") return cliente.points;
+  if (typeof cliente?.total_pontos === "number") return cliente.total_pontos;
+  if (typeof cliente?.loyalty_points === "number")
+    return cliente.loyalty_points;
+  return Math.floor((cliente?.compras || 0) / 100) * 10;
+};
+
+const formatarCelular = (valor = "") => {
+  const numeros = stripNonDigits(valor);
+  const parte1 = numeros.slice(0, 2);
+  const parte2 = numeros.slice(2, 7);
+  const parte3 = numeros.slice(7, 11);
+  if (parte3) return `(${parte1}) ${parte2}-${parte3}`;
+  if (parte2) return `(${parte1}) ${parte2}`;
+  if (parte1) return `(${parte1}`;
+  return "";
+};
+
+const formatarFixo = (valor = "") => {
+  const numeros = stripNonDigits(valor);
+  const parte1 = numeros.slice(0, 2);
+  const parte2 = numeros.slice(2, 6);
+  const parte3 = numeros.slice(6, 10);
+  if (parte3) return `(${parte1}) ${parte2}-${parte3}`;
+  if (parte2) return `(${parte1}) ${parte2}`;
+  if (parte1) return `(${parte1}`;
+  return "";
+};
+
+const formatarCep = (valor = "") => {
+  const numeros = stripNonDigits(valor);
+  const parte1 = numeros.slice(0, 2);
+  const parte2 = numeros.slice(2, 5);
+  const parte3 = numeros.slice(5, 8);
+  if (parte3) return `${parte1}.${parte2}-${parte3}`;
+  if (parte2) return `${parte1}.${parte2}`;
+  if (parte1) return `${parte1}`;
+  return "";
+};
+
+const formatarCpf = (valor = "") => {
+  const numeros = stripNonDigits(valor);
+  const parte1 = numeros.slice(0, 3);
+  const parte2 = numeros.slice(3, 6);
+  const parte3 = numeros.slice(6, 9);
+  const parte4 = numeros.slice(9, 11);
+
+  if (parte4) return `${parte1}.${parte2}.${parte3}-${parte4}`;
+  if (parte3) return `${parte1}.${parte2}.${parte3}`;
+  if (parte2) return `${parte1}.${parte2}`;
+  if (parte1) return `${parte1}`;
+  return "";
+};
 
 export function Clients() {
   const [clientes, setClientes] = useState([]);
@@ -22,27 +110,32 @@ export function Clients() {
 
   const [filtro, setFiltro] = useState("");
   const [erros, setErros] = useState({});
+  const [submitError, setSubmitError] = useState("");
+  const [fetchError, setFetchError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const [paginaAtual, setPaginaAtual] = useState(1);
   const itensPorPagina = 11;
 
-useEffect(() => {
-  loadClientes();
+  const loadClientes = useCallback(async () => {
+    setLoading(true);
+    setFetchError("");
+    try {
+      const data = await getClients();
+      const items = data?.items || [];
+      setClientes(items.map(normalizeCliente));
+    } catch (error) {
+      console.error("Erro ao carregar clientes:", error);
+      setFetchError("Não foi possível carregar os clientes.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  
-}, []);
-
-console.log(clientes);
-  const loadClientes = async () => {
-  try {
-    const data = await getClients();
-        setClientes(data.items);
-  } catch (error) {
-    console.error("Erro ao carregar clientes:", error);
-  }
-};
-
-
+  useEffect(() => {
+    loadClientes();
+  }, [loadClientes]);
 
   const resetForm = () => {
     setNome("");
@@ -58,56 +151,22 @@ console.log(clientes);
     setCep("");
     setClienteEditando(null);
     setErros({});
+    setSubmitError("");
   };
 
-  const calcularPontos = (compras) => {
-    return Math.floor((compras || 0) / 100) * 10;
-  };
-  const formatarCelular = (valor) => {
-    const numeros = valor.replace(/\D/g, "");
-    const parte1 = numeros.slice(0, 2);
-    const parte2 = numeros.slice(2, 7);
-    const parte3 = numeros.slice(7, 11);
-    if (parte3) return `(${parte1}) ${parte2}-${parte3}`;
-    if (parte2) return `(${parte1}) ${parte2}`;
-    if (parte1) return `(${parte1}`;
-    return "";
-  };
+  const buildEnderecoPayload = () => {
+    const address = {
+      logradouro: logradouro.trim(),
+      numero: numero.trim(),
+      bairro: bairro.trim(),
+      cidade: cidade.trim(),
+      estado: estado.trim(),
+      cep: stripNonDigits(cep),
+      fixo: stripNonDigits(fixo),
+    };
 
-  const formatarFixo = (valor) => {
-    const numeros = valor.replace(/\D/g, "");
-    const parte1 = numeros.slice(0, 2);
-    const parte2 = numeros.slice(2, 6);
-    const parte3 = numeros.slice(6, 10);
-    if (parte3) return `(${parte1}) ${parte2}-${parte3}`;
-    if (parte2) return `(${parte1}) ${parte2}`;
-    if (parte1) return `(${parte1}`;
-    return "";
-  };
-
-  const formatarCep = (valor) => {
-    const numeros = valor.replace(/\D/g, "");
-    const parte1 = numeros.slice(0, 2);
-    const parte2 = numeros.slice(2, 5);
-    const parte3 = numeros.slice(5, 8);
-    if (parte3) return `${parte1}.${parte2}-${parte3}`;
-    if (parte2) return `${parte1}.${parte2}`;
-    if (parte1) return `${parte1}`;
-    return "";
-  };
-
-  const formatarCpf = (valor) => {
-    const numeros = valor.replace(/\D/g, "");
-    const parte1 = numeros.slice(0, 3);
-    const parte2 = numeros.slice(3, 6);
-    const parte3 = numeros.slice(6, 9);
-    const parte4 = numeros.slice(9, 11);
-
-    if (parte4) return `${parte1}.${parte2}.${parte3}-${parte4}`;
-    if (parte3) return `${parte1}.${parte2}.${parte3}`;
-    if (parte2) return `${parte1}.${parte2}`;
-    if (parte1) return `${parte1}`;
-    return "";
+    const hasInfo = Object.values(address).some((value) => value);
+    return hasInfo ? JSON.stringify(address) : null;
   };
 
   const validarCampos = () => {
@@ -121,26 +180,26 @@ console.log(clientes);
       novosErros.email = "Digite um e-mail válido.";
     }
 
-    const cpfNumeros = cpf.replace(/\D/g, "");
+    const cpfNumeros = stripNonDigits(cpf);
     if (!cpfNumeros) {
       novosErros.cpf = "O CPF é obrigatório.";
     } else if (!/^\d{11}$/.test(cpfNumeros)) {
       novosErros.cpf = "O CPF deve ter 11 números.";
     }
 
-    const celularNumeros = celular.replace(/\D/g, "");
+    const celularNumeros = stripNonDigits(celular);
     if (!celularNumeros) {
       novosErros.celular = "O celular é obrigatório.";
     } else if (!/^\d{11}$/.test(celularNumeros)) {
       novosErros.celular = "O celular deve ter 11 números.";
     }
 
-    const fixoNumeros = fixo.replace(/\D/g, "");
+    const fixoNumeros = stripNonDigits(fixo);
     if (fixo && !/^\d{10}$/.test(fixoNumeros)) {
       novosErros.fixo = "O telefone fixo deve ter 10 números.";
     }
 
-    const cepNumeros = cep.replace(/\D/g, "");
+    const cepNumeros = stripNonDigits(cep);
     if (cep && !/^\d{8}$/.test(cepNumeros)) {
       novosErros.cep = "O CEP deve ter 8 números.";
     }
@@ -153,85 +212,110 @@ console.log(clientes);
     return Object.keys(novosErros).length === 0;
   };
 
-  const handleCadastrar = () => {
+  const handleSalvarCliente = async () => {
     if (!validarCampos()) return;
+    setSaving(true);
+    setSubmitError("");
 
-    if (clienteEditando) {
-      setClientes(
-        clientes.map((c) =>
-          c.id === clienteEditando.id
-            ? {
-                ...clienteEditando,
-                nome,
-                cpf,
-                email,
-                celular,
-                fixo,
-                logradouro,
-                numero,
-                bairro,
-                cidade,
-                estado,
-                cep,
-              }
-            : c
-        )
-      );
-    } else {
-      const novoCliente = {
-        id: Date.now(),
-        nome,
-        cpf,
-        email,
-        celular,
-        fixo,
-        logradouro,
-        numero,
-        bairro,
-        cidade,
-        estado,
-        cep,
-        compras: 0,
-      };
-      setClientes([...clientes, novoCliente]);
+    const payload = {
+      nome: nome.trim(),
+      cpf: stripNonDigits(cpf),
+      email: email.trim(),
+      telefone: stripNonDigits(celular),
+      endereco: buildEnderecoPayload(),
+    };
+
+    try {
+      let saved;
+      if (clienteEditando) {
+        saved = await updateClient(clienteEditando.id, payload);
+      } else {
+        saved = await createClient(payload);
+      }
+
+      const savedItem = saved?.item || saved;
+      const normalized = normalizeCliente(savedItem);
+
+      setClientes((prev) => {
+        if (clienteEditando) {
+          return prev.map((cliente) =>
+            cliente.id === normalized.id ? normalized : cliente
+          );
+        }
+        return [normalized, ...prev];
+      });
+
+      resetForm();
+      setMostrarModal(false);
+    } catch (error) {
+      console.error("Erro ao salvar cliente:", error);
+      const message =
+        error?.error ||
+        error?.message ||
+        error?.data?.error ||
+        "Não foi possível salvar o cliente.";
+      setSubmitError(message);
+    } finally {
+      setSaving(false);
     }
+  };
 
-    resetForm();
-    setMostrarModal(false);
+  const preencherFormulario = (cliente) => {
+    setClienteEditando(cliente);
+    setNome(cliente.nome || "");
+    setCpf(formatarCpf(cliente.cpf || ""));
+    setEmail(cliente.email || "");
+    setCelular(formatarCelular(cliente.telefone || ""));
+
+    const address = cliente.address || {};
+    setFixo(formatarFixo(address.fixo || ""));
+    setLogradouro(address.logradouro || address.formatted || "");
+    setNumero(address.numero || "");
+    setBairro(address.bairro || "");
+    setCidade(address.cidade || "");
+    setEstado(address.estado || "");
+    setCep(formatarCep(address.cep || ""));
   };
 
   const handleEditar = (cliente) => {
-    setClienteEditando(cliente);
-    setNome(cliente.nome);
-    setCpf(cliente.cpf);
-    setEmail(cliente.email);
-    setCelular(cliente.celular);
-    setFixo(cliente.fixo);
-    setLogradouro(cliente.logradouro);
-    setNumero(cliente.numero);
-    setBairro(cliente.bairro);
-    setCidade(cliente.cidade);
-    setEstado(cliente.estado);
-    setCep(cliente.cep);
+    preencherFormulario(cliente);
     setMostrarModal(true);
   };
 
-  const handleExcluir = (id) => {
-    setClientes(clientes.filter((c) => c.id !== id));
+  const handleExcluir = async (id) => {
+    if (typeof window !== "undefined") {
+      const confirmed = window.confirm(
+        "Deseja realmente excluir este cliente?"
+      );
+      if (!confirmed) return;
+    }
+    setSaving(true);
+    try {
+      await deleteClient(id);
+      setClientes((prev) => prev.filter((c) => c.id !== id));
+    } catch (error) {
+      console.error("Erro ao remover cliente:", error);
+      setFetchError("Não foi possível remover o cliente.");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleAbrirModal = (cliente) => {
-    handleEditar(cliente);
-  };
-
-  const clientesFiltrados = clientes.filter((c) =>
-    c.nome.toLowerCase().includes(filtro.toLowerCase())
-  );
+  const clientesFiltrados = useMemo(() => {
+    const termo = filtro.trim().toLowerCase();
+    if (!termo) return clientes;
+    return clientes.filter((c) =>
+      (c.nome || "").toLowerCase().includes(termo)
+    );
+  }, [clientes, filtro]);
 
   const indexUltimo = paginaAtual * itensPorPagina;
   const indexPrimeiro = indexUltimo - itensPorPagina;
   const clientesPagina = clientesFiltrados.slice(indexPrimeiro, indexUltimo);
-  const totalPaginas = Math.ceil(clientesFiltrados.length / itensPorPagina);
+  const totalPaginas = Math.ceil(
+    Math.max(clientesFiltrados.length, 1) / itensPorPagina
+  );
+  const placeholders = Math.max(itensPorPagina - clientesPagina.length, 0);
 
   return (
     <Layout>
@@ -257,21 +341,25 @@ console.log(clientes);
             </div>
 
             <div className={styles.listaClientes}>
-              {clientesPagina.map((cliente) => (
-                <div
-                  key={cliente.id}
-                  className={styles.clienteCard}
-                  onClick={() => handleAbrirModal(cliente)}
-                >
+              {fetchError && (
+                <div className={styles.erro}>{fetchError}</div>
+              )}
+              {loading ? (
+                <p>Carregando clientes...</p>
+              ) : clientesPagina.length ? (
+                clientesPagina.map((cliente) => (
+                  <div
+                    key={cliente.id}
+                    className={styles.clienteCard}
+                    onClick={() => handleEditar(cliente)}
+                  >
                   <div className={styles.cardLeft}>
                     <span className={styles.nomeCliente}>{cliente.nome}</span>
                   </div>
-                  <div className={styles.cardCenter}>
+                      <div className={styles.cardCenter}>
                     <span className={styles.pontuacao}>
                       Pontuação:{" "}
-                      {calcularPontos(cliente.compras)
-                        .toString()
-                        .padStart(4, "0")}
+                      {calcularPontos(cliente).toString().padStart(4, "0")}
                     </span>
                   </div>
                   <div className={styles.cardActions}>
@@ -283,26 +371,26 @@ console.log(clientes);
                     >
                       Editar
                     </button>
-                    <button
+                      <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleExcluir(cliente.id);
                       }}
+                      disabled={saving}
                     >
                       Excluir
                     </button>
                   </div>
                 </div>
-              ))}
+              ))
+              ) : (
+                !fetchError && <p>Nenhum cliente encontrado.</p>
+              )}
 
-              {Array.from({
-                length: itensPorPagina - clientesPagina.length,
-              }).map((_, i) => (
-                <div
-                  key={`vazio-${i}`}
-                  className={styles.clienteCardVazio}
-                ></div>
-              ))}
+              {!loading &&
+                Array.from({ length: placeholders }).map((_, i) => (
+                  <div key={`vazio-${i}`} className={styles.clienteCardVazio} />
+                ))}
             </div>
 
             <div className={styles.paginacao}>
@@ -469,10 +557,17 @@ console.log(clientes);
                   <button onClick={() => setMostrarModal(false)}>
                     Cancelar
                   </button>
-                  <button onClick={handleCadastrar}>
-                    {clienteEditando ? "Salvar Alterações" : "Cadastrar"}
+                  <button onClick={handleSalvarCliente} disabled={saving}>
+                    {saving
+                      ? "Salvando..."
+                      : clienteEditando
+                        ? "Salvar Alterações"
+                        : "Cadastrar"}
                   </button>
                 </div>
+                {submitError && (
+                  <small className={styles.erro}>{submitError}</small>
+                )}
               </div>
             </div>
           )}

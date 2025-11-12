@@ -1,16 +1,14 @@
- 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from './TransactionModal.module.css';
 import { Header } from "../Header";
-import clientsData from '../../../data/mockClients.json'
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
-import { createTransaction } from "../../../services/api";
+import { createTransaction, getClients } from "../../../services/api";
 
-export function TransactionModal({ onSave, onClose }) {
+export function TransactionModal({ onSave, onClose, categories = [] }) {
     const [formData, setFormData] = useState({
         type: "",
-        title: "",
+        description: "",
         category: "",
         date: "",
         amount: ""
@@ -20,7 +18,45 @@ export function TransactionModal({ onSave, onClose }) {
     const [cpfCliente, setCpfCliente] = useState("");
     const [selectedClient, setSelectedClient] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [clients, setClients] = useState([]);
+    const [clientsLoading, setClientsLoading] = useState(false);
+    const [clientSearchError, setClientSearchError] = useState("");
     const navigate = useNavigate();
+
+    useEffect(() => {
+        let active = true;
+        const loadClients = async () => {
+            setClientsLoading(true);
+            setClientSearchError("");
+            try {
+                const response = await getClients();
+                if (!active) return;
+                setClients(response?.items || []);
+            } catch (error) {
+                console.error("Erro ao buscar clientes para o modal:", error);
+                if (active) {
+                    setClientSearchError("Não foi possível carregar os clientes.");
+                }
+            } finally {
+                if (active) setClientsLoading(false);
+            }
+        };
+        loadClients();
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    const availableCategories = useMemo(() => {
+        if (categories.length) return categories;
+        return [
+            { id: "Vendas", name: "Vendas" },
+            { id: "Estoque", name: "Estoque" },
+            { id: "Despesas", name: "Despesas" },
+            { id: "Marketing", name: "Marketing" },
+            { id: "Outros", name: "Outros" },
+        ];
+    }, [categories]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,9 +66,11 @@ export function TransactionModal({ onSave, onClose }) {
             const amountValue = Number(formData.amount);
 
             const newTransaction = {
-                ...formData,
-                amount: formData.type === "saida" ? -Math.abs(amountValue) : Math.abs(amountValue),
-                cliente: somarPontos === "sim" ? selectedClient : null,
+                description: formData.description.trim(),
+                amount: Math.abs(amountValue),
+                type: formData.type,
+                transaction_date: formData.date,
+                category: formData.category || null,
             };
 
             console.log("Nova transação:", newTransaction);
@@ -41,24 +79,41 @@ export function TransactionModal({ onSave, onClose }) {
             const response = await createTransaction(newTransaction);
             console.log("Transação registrada com sucesso:", response);
 
-            alert("Transação registrada com sucesso!");
-
             // Atualiza o estado do pai (opcional)
-            if (onSave) onSave(newTransaction);
+            if (onSave) onSave(response);
 
+            alert("Transação registrada com sucesso!");
             onClose();
         } catch (error) {
             console.error("Erro ao registrar transação:", error);
-            alert("Erro ao registrar transação. Verifique o console.");
+            alert(
+                error?.error ||
+                error?.message ||
+                "Erro ao registrar transação. Verifique o console."
+            );
         } finally {
             setLoading(false);
         }
     };
 
     const handleBuscarCliente = () => {
+        setClientSearchError("");
         const cpfFormatado = cpfCliente.replace(/\D/g, "");
-        const client = clientsData.find(c => c.cpf.replace(/\D/g, "") === cpfFormatado);
-        setSelectedClient(client || null);
+        if (!cpfFormatado || cpfFormatado.length < 11) {
+            setClientSearchError("Informe um CPF válido para buscar.");
+            setSelectedClient(null);
+            return;
+        }
+
+        const client = clients.find(
+            (c) => (c.cpf || "").replace(/\D/g, "") === cpfFormatado
+        );
+        if (!client) {
+            setSelectedClient(null);
+            setClientSearchError("Nenhum cliente encontrado com esse CPF.");
+            return;
+        }
+        setSelectedClient(client);
     };
 
     return (
@@ -100,11 +155,11 @@ export function TransactionModal({ onSave, onClose }) {
 
                     {/* Buscar Cliente */}
                     {somarPontos === "sim" && (
-                        <div className={styles.field}>
-                            <label>CPF do Cliente</label>
-                            <div className={styles.cpfSearch}>
-                                <input
-                                    type="text"
+                    <div className={styles.field}>
+                        <label>CPF do Cliente</label>
+                        <div className={styles.cpfSearch}>
+                            <input
+                                type="text"
                                     placeholder="Digite o CPF"
                                     value={cpfCliente}
                                     onChange={(e) => setCpfCliente(e.target.value)}
@@ -117,6 +172,17 @@ export function TransactionModal({ onSave, onClose }) {
                                     <FaSearch />
                                 </button>
                             </div>
+
+                            {clientsLoading && (
+                                <small className={styles.helperText}>
+                                    Carregando clientes...
+                                </small>
+                            )}
+                            {clientSearchError && (
+                                <small className={styles.errorText}>
+                                    {clientSearchError}
+                                </small>
+                            )}
 
                             <button
                                 type="button"
@@ -131,7 +197,7 @@ export function TransactionModal({ onSave, onClose }) {
                                     <p>Nome: {selectedClient.nome}</p>
                                     <p>Email: {selectedClient.email}</p>
                                     <p>CPF: {selectedClient.cpf}</p>
-                                    <p>Telefone: {selectedClient.telefone}</p>
+                                    <p>Telefone: {selectedClient.telefone || "Não informado"}</p>
                                 </div>
                             )}
                         </div>
@@ -157,8 +223,8 @@ export function TransactionModal({ onSave, onClose }) {
                         <input
                             type="text"
                             placeholder="Ex: Venda, Aluguel, Compra de estoque..."
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             required
                         />
                     </div>
@@ -182,12 +248,12 @@ export function TransactionModal({ onSave, onClose }) {
                             value={formData.category}
                             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                         >
-                            <option value="" disabled>Selecione a categoria</option>
-                            <option value="Vendas">Vendas</option>
-                            <option value="Estoque">Estoque</option>
-                            <option value="Despesas">Despesas</option>
-                            <option value="Marketing">Marketing</option>
-                            <option value="Outros">Outros</option>
+                            <option value="">Selecione a categoria</option>
+                            {availableCategories.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                    {category.name}
+                                </option>
+                            ))}
                         </select>
                     </div>
 

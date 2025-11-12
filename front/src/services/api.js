@@ -83,6 +83,12 @@ export const apiRequest = async (method, url, data = {}, params = {}) => {
 
 // Clients
 export const getClients = () => apiRequest("GET", "/clients");
+export const createClient = (payload) =>
+  apiRequest("POST", "/clients", payload);
+export const updateClient = (id, payload) =>
+  apiRequest("PUT", `/clients/${id}`, payload);
+export const deleteClient = (id) =>
+  apiRequest("DELETE", `/clients/${id}`);
 
 
 // Finances (GET helpers)

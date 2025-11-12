@@ -131,6 +131,16 @@ select:focus {
     color: var(--muted-foreground);
 }
 
+.helperText {
+    font-size: 0.85rem;
+    color: var(--muted-foreground);
+}
+
+.errorText {
+    font-size: 0.85rem;
+    color: var(--destructive);
+}
+
 .buttons {
     display: flex;
     justify-content: flex-end;
