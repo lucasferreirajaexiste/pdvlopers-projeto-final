@@ -226,6 +226,10 @@
     border-color: var(--ring);
     box-shadow: 0 0 0 2px rgba(255, 190, 11, 0.25);
 }
+.nomeCliente {
+    color: #FFFFFF;
+    font-weight: bold;
+}
 
 .nome input { width: 100%; max-width: 400px; }
 .cpf input { width: 180px; text-align: center; }
