@@ -126,7 +126,7 @@ export function Finances() {
     <Layout>
       <div className={styles.container}>
         <div className={styles.header}>
-          <Header title="Financeiro" subtitle="Controle suas finanças e fluxo de caixa" />
+          <Header subtitle="Controle suas finanças e fluxo de caixa" />
           <div>
             <Button icon={<LuPlus />} text="Nova Transação" onClick={() => setShowModal(true)} />
 
